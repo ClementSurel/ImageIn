@@ -43,7 +43,7 @@ void SubWin::save ()
 {
     QImage imgToSave(*m_img);
     m_painter->begin(&imgToSave);
-    m_painter->drawPixmap(bubble->x(), bubble->y(), *bubble->pixmap());
+    m_painter->drawPixmap(bubble->x(), bubble->y(), QPixmap::fromImage(bubble->createFinalImage()));
     m_painter->end();
     QString fname = QFileDialog::getSaveFileName(this, nullptr, nullptr, ".bmp");
     imgToSave.save(fname, "BMP");
