@@ -16,6 +16,9 @@ public:
     ~Bubble();
     void mousePressEvent (QMouseEvent*);
     void mouseMoveEvent (QMouseEvent*);
+    void mouseDoubleClickEvent (QMouseEvent*);
+    void focusOutEvent (QFocusEvent*);
+    QImage createFinalImage ();
 
 signals:
     void grabbed(QPoint);
@@ -27,6 +30,8 @@ private:
     QPoint relativePos;
 
     QTextEdit *text;
+
+    QLabel *editingText;
 };
 
 #endif // BUBBLE_H
