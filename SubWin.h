@@ -1,12 +1,34 @@
 #ifndef SUBWIN_H
 #define SUBWIN_H
 
-#include <QWidget>
+#include <QtWidgets>
+#include <QPicture>
 
-class subWin
+#include "bubble.h"
+
+class SubWin : public QWidget
 {
+    Q_OBJECT
+
 public:
-    subWin();
+    SubWin();
+    ~SubWin();
+
+public slots:
+    void save ();
+    void reverseH();
+    void reverseV();
+    void moveElement(QPoint);
+
+private:
+    QImage *m_img;
+    QPainter *m_painter;
+    QLabel *m_lab;
+
+    QPoint relativePos;
+
+public:
+    Bubble *bubble;
 };
 
 #endif // SUBWIN_H
