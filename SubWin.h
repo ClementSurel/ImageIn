@@ -19,6 +19,7 @@ public slots:
     void reverseH();
     void reverseV();
     void moveElement(QPoint);
+    void addBubble();
 
 private:
     QImage *m_img;
@@ -27,8 +28,7 @@ private:
 
     QPoint relativePos;
 
-public:
-    Bubble *bubble;
+    QVector<Bubble*> bubbles;
 };
 
 #endif // SUBWIN_H

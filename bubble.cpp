@@ -2,13 +2,13 @@
 
 Bubble::Bubble(QWidget* parent) : QLabel (parent)
 {
-    img = new QImage(140, 100, QImage::Format_ARGB32);
+    img = new QImage(160, 100, QImage::Format_ARGB32);
     QColor color(Qt::transparent);
     img->fill(color);
     painter = new QPainter(img);
 
     text = new QTextEdit(this);
-    text->setGeometry(20, 20, 100, 60);
+    text->setGeometry(20, 20, img->width()-40, 60);
     //text->setVisible(false);
     text->setAlignment(Qt::AlignCenter);
 
@@ -62,14 +62,14 @@ void Bubble::mouseDoubleClickEvent (QMouseEvent *)
         editingText->setVisible(false);
         text->setVisible(true);
         grabMouse();
-        //text->grabKeyboard();
+        text->grabKeyboard();
     }
     else
     {
         text->setVisible(false);
         editingText->setVisible(true);
         editingText->setText(text->toPlainText());
-        //text->releaseKeyboard();
+        text->releaseKeyboard();
         releaseMouse();
     }
 }

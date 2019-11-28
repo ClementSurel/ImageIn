@@ -5,7 +5,7 @@
 SubWin::SubWin()
 {
     m_img = new QImage;
-    m_img->load("ex.jpg");
+    m_img->load("ex_laugh.jpg");
 
     QImage* newImg = new QImage;
     *newImg = m_img->scaled(QSize(600, 400), Qt::KeepAspectRatio);
@@ -16,18 +16,11 @@ SubWin::SubWin()
 
     m_lab = new QLabel(this);
 
-    bubble = new Bubble(this);
-
     setGeometry(0, 0, 500, 500);
 
     m_lab->setPixmap(QPixmap::fromImage(*m_img));
 
     m_lab->setGeometry(0, 0, m_img->width(), m_img->height());
-
-    // Put a bubble on the image
-    bubble->setGeometry(0, 0, bubble->width() ,bubble->height());
-
-    connect(bubble, SIGNAL(grabbed(QPoint)), this, SLOT(moveElement(QPoint)));
 }
 
 SubWin::~SubWin()
@@ -36,14 +29,16 @@ SubWin::~SubWin()
     delete m_img;
     delete m_lab;
 
-    delete bubble;
+    for (int i = 0; i < bubbles.length(); i++)
+        delete bubbles[i];
 }
 
 void SubWin::save ()
 {
     QImage imgToSave(*m_img);
     m_painter->begin(&imgToSave);
-    m_painter->drawPixmap(bubble->x(), bubble->y(), QPixmap::fromImage(bubble->createFinalImage()));
+    for (int i = 0; i < bubbles.length(); i++)
+        m_painter->drawPixmap(bubbles[i]->x(), bubbles[i]->y(), QPixmap::fromImage(bubbles[i]->createFinalImage()));
     m_painter->end();
     QString fname = QFileDialog::getSaveFileName(this, nullptr, nullptr, ".bmp");
     imgToSave.save(fname, "BMP");
@@ -74,3 +69,14 @@ void SubWin::moveElement (QPoint globalPos)
 
     pB->move(point.x() - pB->width()/2, point.y() - pB->height()/2);
 }
+
+void SubWin::addBubble()
+{
+    Bubble* newBubble = new Bubble(this);
+    bubbles.push_back(newBubble);
+
+    newBubble->show();
+
+    connect(newBubble, SIGNAL(grabbed(QPoint)), this, SLOT(moveElement(QPoint)));
+}
+

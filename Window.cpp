@@ -33,7 +33,7 @@ Window::Window(QWidget *parent) : QMainWindow(parent)
     connect(m_act_reverseH, SIGNAL(triggered()), m_centralSubWin, SLOT(reverseH()));
     connect(m_act_reverseV, SIGNAL(triggered()), m_centralSubWin, SLOT(reverseV()));
     connect(m_act_save, SIGNAL(triggered()), m_centralSubWin, SLOT(save()));
-    connect(m_bubble, SIGNAL(triggered()), this, SLOT(update()));
+    connect(m_bubble, SIGNAL(triggered()), m_centralSubWin, SLOT(addBubble()));
 }
 
 Window::~Window()
