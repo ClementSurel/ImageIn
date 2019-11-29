@@ -3,25 +3,32 @@
 
 #include <QPainter>
 #include <QImage>
-#include <QLabel>
+#include <QtWidgets>
 #include <QMouseEvent>
-#include <QTextEdit>
+
+
+#define MIN_SIZE_W      80
+#define MIN_SIZE_H      80
+
 
 class Bubble : public QLabel
 {
     Q_OBJECT
 
 public:
-    Bubble(QWidget *parent);
+    Bubble(QWidget *parent = nullptr);
     ~Bubble();
     void mousePressEvent (QMouseEvent*);
     void mouseMoveEvent (QMouseEvent*);
     void mouseDoubleClickEvent (QMouseEvent*);
-    void focusOutEvent (QFocusEvent*);
     QImage createFinalImage ();
 
 signals:
     void grabbed(QPoint);
+
+public slots:
+    void resizeWidth(int value);
+    void resizeHeight(int value);
 
 private:
     QImage *img;

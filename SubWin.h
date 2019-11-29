@@ -6,19 +6,22 @@
 
 #include "bubble.h"
 
+
 class SubWin : public QWidget
 {
     Q_OBJECT
 
 public:
-    SubWin();
+    SubWin(QWidget* parent = nullptr);
     ~SubWin();
 
 public slots:
+    void loadImage();
     void save ();
     void reverseH();
     void reverseV();
     void moveElement(QPoint);
+    void addBubble();
 
 private:
     QImage *m_img;
@@ -27,8 +30,11 @@ private:
 
     QPoint relativePos;
 
-public:
-    Bubble *bubble;
+    QVector<Bubble*> bubbles;
+    Bubble *activeBubble;
+
+    QSlider *hSlider;
+    QSlider *vSlider;
 };
 
 #endif // SUBWIN_H
