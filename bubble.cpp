@@ -1,25 +1,26 @@
 #include "bubble.h"
 
 Bubble::Bubble(QWidget* parent) : QLabel (parent)
-{
-    img = new QImage(160, 100, QImage::Format_ARGB32);
+{      
+    img = new QImage(MIN_SIZE_W, MIN_SIZE_H, QImage::Format_ARGB32);
     QColor color(Qt::transparent);
     img->fill(color);
     painter = new QPainter(img);
+    painter->setRenderHints(QPainter::Antialiasing, true);
 
     text = new QTextEdit(this);
-    text->setGeometry(20, 20, img->width()-40, 60);
-    //text->setVisible(false);
+    text->setGeometry(20, 20, img->width()-40, img->height()-40);
+    text->setVisible(false);
     text->setAlignment(Qt::AlignCenter);
 
     editingText = new QLabel(this);
-    editingText->setGeometry(text->x(), text->y(), text->width(), text->height());
-    editingText->setAlignment(Qt::AlignHCenter);
+    editingText->setGeometry(20, 20, img->width()-40, img->height()-40);
+    editingText->setAlignment(Qt::AlignCenter);
     editingText->setWordWrap(true);
 
     // Paint the bubble
     QPainterPath path(QPointF(0, 0));
-    path.addEllipse(QRectF(0, 0, img->width(), img->height()));
+    path.addEllipse(QRectF(10, 10, img->width()-20, img->height()-20));
     painter->drawPath(path);
     painter->fillPath(path, QBrush(Qt::white));
 
@@ -51,7 +52,6 @@ void Bubble::mousePressEvent (QMouseEvent* event)
 
 void Bubble::mouseMoveEvent (QMouseEvent* event)
 {
-    grabMouse();
     emit grabbed(event->globalPos());
 }
 
@@ -74,14 +74,55 @@ void Bubble::mouseDoubleClickEvent (QMouseEvent *)
     }
 }
 
-void Bubble::focusOutEvent (QFocusEvent*)
+void Bubble::resizeWidth(int value)
 {
-    /*
+    setGeometry(x(), y(), MIN_SIZE_W+10*value, height());
+
+    // Repaint the image
+    delete img;
+    img = new QImage(this->width(), this->height(), QImage::Format_ARGB32);
+    QColor color(Qt::transparent);
+    img->fill(color);
+    QPainterPath path(QPointF(0, 0));
+    path.addEllipse(QRectF(10, 10, img->width()-20, img->height()-20));
     painter->begin(img);
-    painter->drawText(QRectF(0, 0, img->width(), img->height()), Qt::AlignCenter, text->toPlainText());
+    painter->setRenderHints(QPainter::Antialiasing, true);
+
+    painter->setPen(Qt::black);
+    painter->drawPath(path);
+    painter->fillPath(path, QBrush(Qt::white));
     painter->end();
-    */
-    //text->hide();
+
+    text->setGeometry(20, 20, img->width()-40, img->height()-40);
+    editingText->setGeometry(20, 20, img->width()-40, img->height()-40);
+    setPixmap(QPixmap::fromImage(*img));
+}
+
+void Bubble::resizeHeight(int value)
+{
+    int newHeight = MIN_SIZE_H+10*value;
+    int lastHeight = height();
+    int changeInHeight = newHeight - lastHeight;
+    setGeometry(x(), y()-changeInHeight, width(), newHeight);
+
+    // Repaint the image
+    delete img;
+    img = new QImage(this->width(), this->height(), QImage::Format_ARGB32);
+    QColor color(Qt::transparent);
+    img->fill(color);
+    QPainterPath path(QPointF(0, 0));
+    path.addEllipse(QRectF(10, 10, img->width()-20, img->height()-20));
+    painter->begin(img);
+    painter->setRenderHints(QPainter::Antialiasing, true);
+
+    painter->setPen(Qt::black);
+    painter->drawPath(path);
+    painter->fillPath(path, QBrush(Qt::white));
+    painter->end();
+
+    text->setGeometry(20, 20, img->width()-40, img->height()-40);
+    editingText->setGeometry(20, 20, img->width()-40, img->height()-40);
+    setPixmap(QPixmap::fromImage(*img));
 }
 
 QImage Bubble::createFinalImage()

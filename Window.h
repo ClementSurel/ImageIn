@@ -22,6 +22,7 @@ private:
     // Menu File
     QMenu* m_menuFile;
     QAction* m_act_save;
+    QAction* act_load;
 
     // Menu Edit
     QMenu* m_menuEdit;
