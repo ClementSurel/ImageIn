@@ -8,15 +8,15 @@ Bubble::Bubble(QWidget* parent) : QLabel (parent)
     painter = new QPainter(img);
     painter->setRenderHints(QPainter::Antialiasing, true);
 
-    text = new QTextEdit(this);
-    text->setGeometry(20, 20, img->width()-40, img->height()-40);
-    text->setVisible(false);
-    text->setAlignment(Qt::AlignCenter);
-
-    editingText = new QLabel(this);
+    editingText = new QTextEdit(this);
     editingText->setGeometry(20, 20, img->width()-40, img->height()-40);
+    editingText->setVisible(false);
     editingText->setAlignment(Qt::AlignCenter);
-    editingText->setWordWrap(true);
+
+    printedText = new QLabel(this);
+    printedText->setGeometry(20, 20, img->width()-40, img->height()-40);
+    printedText->setAlignment(Qt::AlignCenter);
+    printedText->setWordWrap(true);
 
     // Paint the bubble
     QPainterPath path(QPointF(0, 0));
@@ -40,9 +40,9 @@ Bubble::~Bubble()
     delete painter;
     delete img;
 
-    delete text;
-
     delete editingText;
+
+    delete printedText;
 }
 
 void Bubble::mousePressEvent (QMouseEvent* event)
@@ -52,24 +52,25 @@ void Bubble::mousePressEvent (QMouseEvent* event)
 
 void Bubble::mouseMoveEvent (QMouseEvent* event)
 {
-    emit grabbed(event->globalPos());
+    emit grabbed(event, relativePos);
 }
 
 void Bubble::mouseDoubleClickEvent (QMouseEvent *)
 {
-    if (text->isVisible() == false)
+    if (editingText->isVisible() == false)
     {
-        editingText->setVisible(false);
-        text->setVisible(true);
+        emit editing();
+        printedText->setVisible(false);
+        editingText->setVisible(true);
         grabMouse();
-        text->grabKeyboard();
+        editingText->grabKeyboard();
     }
     else
     {
-        text->setVisible(false);
-        editingText->setVisible(true);
-        editingText->setText(text->toPlainText());
-        text->releaseKeyboard();
+        editingText->setVisible(false);
+        printedText->setVisible(true);
+        printedText->setText(editingText->toPlainText());
+        editingText->releaseKeyboard();
         releaseMouse();
     }
 }
@@ -93,8 +94,8 @@ void Bubble::resizeWidth(int value)
     painter->fillPath(path, QBrush(Qt::white));
     painter->end();
 
-    text->setGeometry(20, 20, img->width()-40, img->height()-40);
     editingText->setGeometry(20, 20, img->width()-40, img->height()-40);
+    printedText->setGeometry(20, 20, img->width()-40, img->height()-40);
     setPixmap(QPixmap::fromImage(*img));
 }
 
@@ -120,8 +121,8 @@ void Bubble::resizeHeight(int value)
     painter->fillPath(path, QBrush(Qt::white));
     painter->end();
 
-    text->setGeometry(20, 20, img->width()-40, img->height()-40);
     editingText->setGeometry(20, 20, img->width()-40, img->height()-40);
+    printedText->setGeometry(20, 20, img->width()-40, img->height()-40);
     setPixmap(QPixmap::fromImage(*img));
 }
 
@@ -133,8 +134,19 @@ QImage Bubble::createFinalImage()
     QImage finalImage(*img);
 
     painter->begin(&finalImage);
-    painter->drawText(QRectF(text->x(), text->y(), text->width(), text->height()), text->toPlainText(), textOp);
+    painter->drawText(QRectF(editingText->x(), editingText->y(), editingText->width(), editingText->height()), editingText->toPlainText(), textOp);
     painter->end();
 
     return finalImage;
 }
+
+void Bubble::setInactive ()
+{
+    editingText->setVisible(false);
+    printedText->setVisible(true);
+    printedText->setText(editingText->toPlainText());
+    editingText->releaseKeyboard();
+    releaseMouse();
+}
+
+

@@ -6,6 +6,9 @@
 
 #include "bubble.h"
 
+#define MIN_IMG_SIZE_W      100
+#define MIN_IMG_SIZE_H      100
+
 
 class SubWin : public QWidget
 {
@@ -14,27 +17,34 @@ class SubWin : public QWidget
 public:
     SubWin(QWidget* parent = nullptr);
     ~SubWin();
+    void mouseDoubleClickEvent(QMouseEvent*);
 
 public slots:
     void loadImage();
     void save ();
     void reverseH();
     void reverseV();
-    void moveElement(QPoint);
+    void moveElement(QMouseEvent*, QPoint);
     void addBubble();
+    void updateEditingBubble();
+    void resizeWidth(int value);
 
 private:
     QImage *m_img;
+    QImage *loadedImage;
     QPainter *m_painter;
     QLabel *m_lab;
 
     QPoint relativePos;
 
     QVector<Bubble*> bubbles;
-    Bubble *activeBubble;
+    Bubble *movingBubble;
+    Bubble *editingBubble;
 
     QSlider *hSlider;
     QSlider *vSlider;
+
+    QSlider *sliderForImage;
 };
 
 #endif // SUBWIN_H
