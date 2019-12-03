@@ -15,6 +15,7 @@ Window::Window(QWidget *parent) : QMainWindow(parent)
     m_act_reverseH = new QAction("Reverse horizontally");
     m_act_reverseV = new QAction("Reverse vertically");
     m_bubble = new QAction("Bubble");
+    act_crop = new QAction("Crop");
 
     m_centralSubWin = new SubWin(this);
 
@@ -28,6 +29,7 @@ Window::Window(QWidget *parent) : QMainWindow(parent)
     m_menuEdit->addAction(m_act_reverseH);
     m_menuEdit->addAction(m_act_reverseV);
     m_menuEdit->addAction(m_bubble);
+    m_menuEdit->addAction(act_crop);
     menuBar()->addMenu(m_menuEdit);
 
     setCentralWidget(m_centralSubWin);
@@ -38,6 +40,7 @@ Window::Window(QWidget *parent) : QMainWindow(parent)
     connect(m_act_save, SIGNAL(triggered()), m_centralSubWin, SLOT(save()));
     connect(m_bubble, SIGNAL(triggered()), m_centralSubWin, SLOT(addBubble()));
     connect(act_load, SIGNAL(triggered()), m_centralSubWin, SLOT(loadImage()));
+    connect(act_crop, SIGNAL(triggered()), m_centralSubWin, SLOT(crop()));
 }
 
 Window::~Window()

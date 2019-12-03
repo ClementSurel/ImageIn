@@ -27,6 +27,7 @@ private:
     QAction* m_act_reverseH;
     QAction* m_act_reverseV;
     QAction* m_bubble;
+    QAction *act_crop;
 
     // central widget
     SubWin* m_centralSubWin;

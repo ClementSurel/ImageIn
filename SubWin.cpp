@@ -18,10 +18,14 @@ SubWin::SubWin(QWidget* parent) : QWidget(parent)
     sliderForImage->setGeometry(80, 20, 200, 50);
     sliderForImage->hide();
 
-    //m_img = new QImage;
     m_img = new QImage(800, 600, QImage::Format_ARGB32);
     QColor color(Qt::transparent);
     m_img->fill(color);
+
+    reversedHorizontally = false;
+    reversedVertically = false;
+    croped = false;
+    cropDimensions = QRect(0, 0, 800, 600);
 
     loadedImage = new QImage;
 
@@ -31,7 +35,7 @@ SubWin::SubWin(QWidget* parent) : QWidget(parent)
 
     m_lab->setPixmap(QPixmap::fromImage(*m_img));
 
-    m_lab->setGeometry(0, 0, m_img->width(), m_img->height());
+    m_lab->setGeometry(80, 80, m_img->width(), m_img->height());
     setGeometry(0, 0, 800, 600);
 
     movingBubble = nullptr;
@@ -73,6 +77,11 @@ void SubWin::reverseH ()
     delete m_img;
     m_img = timg;
     m_lab->setPixmap(QPixmap::fromImage(*m_img));
+
+    if (reversedHorizontally)
+        reversedHorizontally = false;
+    else
+        reversedHorizontally = true;
 }
 
 void SubWin::reverseV ()
@@ -82,6 +91,11 @@ void SubWin::reverseV ()
     delete m_img;
     m_img = timg;
     m_lab->setPixmap(QPixmap::fromImage(*m_img));
+
+    if (reversedVertically)
+        reversedVertically = false;
+    else
+        reversedVertically = true;
 }
 
 void SubWin::moveElement (QMouseEvent* event, QPoint relativePos)
@@ -133,13 +147,21 @@ void SubWin::loadImage()
         {
             delete m_img;
             m_img = new QImage(*loadedImage);
-            //*m_img = loadedImage->scaled(QSize(800, 600), Qt::KeepAspectRatio);
+
+            reversedHorizontally = false;
+            reversedVertically = false;
+            croped = false;
 
             m_lab->setPixmap(QPixmap::fromImage(*m_img));
             m_lab->setGeometry(80, 80, m_img->width(), m_img->height());
-            sliderForImage->setValue((m_img->width() - MIN_IMG_SIZE_W)/50);
+            sliderForImage->setValue((m_img->width() - MIN_IMG_SIZE_W)/35);
         }
     }
+
+    cropDimensions.setX(0);
+    cropDimensions.setY(0);
+    cropDimensions.setWidth(m_img->width());
+    cropDimensions.setHeight(m_img->height());
 }
 
 void SubWin::mouseDoubleClickEvent (QMouseEvent*)
@@ -158,9 +180,60 @@ void SubWin::updateEditingBubble()
 
 void SubWin::resizeWidth(int value)
 {
-    *m_img = loadedImage->scaled(MIN_IMG_SIZE_W+35*value, 2500, Qt::KeepAspectRatio);
+    *m_img = *loadedImage;
+
+    if (reversedHorizontally)
+        *m_img = m_img->mirrored(true, false);
+
+    if (reversedVertically)
+        *m_img = m_img->mirrored(false, true);
+
+    if (croped)
+        *m_img = m_img->copy(cropDimensions);
+
+    *m_img = m_img->scaled(MIN_IMG_SIZE_W+35*value, 2500, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     m_lab->setGeometry(80, 80, m_img->width(), m_img->height());
     m_lab->setPixmap(QPixmap::fromImage(*m_img));
+
 }
 
+void SubWin::crop (QRect userCrop)
+{
+    if ( ! croped )
+    {
+        cropDimensions.setX(userCrop.x()*loadedImage->width()/m_img->width());
+        cropDimensions.setY(userCrop.y()*loadedImage->height()/m_img->height());
+        cropDimensions.setWidth(userCrop.width()*loadedImage->width()/m_img->width());
+        cropDimensions.setHeight(userCrop.height()*loadedImage->height()/m_img->height());
+    }
+    else
+    {
+        /*
+        cropDimensions.setX(d.x()*loadedImage->width()/cropDimensions.width());
+        cropDimensions.setY(d.y()*loadedImage->height()/cropDimensions.height());
+        cropDimensions.setWidth(d.width()*loadedImage->width()/cropDimensions.width());
+        cropDimensions.setHeight(d.height()*loadedImage->height()/cropDimensions.height());
+        */
+
+        cropDimensions.setX(cropDimensions.x()+userCrop.x()*cropDimensions.width()/m_img->width());
+        cropDimensions.setY(cropDimensions.y()+userCrop.y()*cropDimensions.height()/m_img->height());
+        cropDimensions.setWidth(userCrop.width()*cropDimensions.width()/m_img->width());
+        cropDimensions.setHeight(userCrop.height()*cropDimensions.height()/m_img->height());
+    }
+
+    *m_img = m_img->copy(userCrop);
+
+    m_lab->setGeometry(80, 80, m_img->width(), m_img->height());
+    m_lab->setPixmap(QPixmap::fromImage(*m_img));
+
+    croped = true;
+
+    sliderForImage->setValue((m_img->width() - MIN_IMG_SIZE_W)/35);
+}
+
+void SubWin::crop ()
+{
+    if ( ! croped )
+        crop(QRect(100, 100, 350, 350));
+}
 

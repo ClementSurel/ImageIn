@@ -28,12 +28,20 @@ public slots:
     void addBubble();
     void updateEditingBubble();
     void resizeWidth(int value);
+    void crop(QRect);
+    void crop();
 
 private:
-    QImage *m_img;
+    // Image
     QImage *loadedImage;
-    QPainter *m_painter;
+    QImage *m_img;
     QLabel *m_lab;
+    bool reversedHorizontally;
+    bool reversedVertically;
+    bool croped;
+    QRect cropDimensions;
+
+    QPainter *m_painter;
 
     QPoint relativePos;
 
