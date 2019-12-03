@@ -4,10 +4,12 @@
 #include <QtWidgets>
 #include <QPicture>
 
+#include "Photo.h"
 #include "bubble.h"
 
-#define MIN_IMG_SIZE_W      100
-#define MIN_IMG_SIZE_H      100
+
+#define PAGE_W          2480
+#define PAGE_H          3508
 
 
 class SubWin : public QWidget
@@ -25,21 +27,22 @@ public slots:
     void reverseH();
     void reverseV();
     void moveElement(QMouseEvent*, QPoint);
+    void movePhoto (QMouseEvent* event, QPoint relativePos);
     void addBubble();
     void updateEditingBubble();
     void resizeWidth(int value);
-    void crop(QRect);
     void crop();
 
 private:
-    // Image
-    QImage *loadedImage;
-    QImage *m_img;
+    // Page
+    QImage *page;
+    QLabel *labPage;
+
+    // Images
     QLabel *m_lab;
-    bool reversedHorizontally;
-    bool reversedVertically;
-    bool croped;
-    QRect cropDimensions;
+
+    Photo* activePhoto;
+    QVector<Photo*> tabOfPhoto;
 
     QPainter *m_painter;
 
