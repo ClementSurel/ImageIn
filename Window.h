@@ -16,8 +16,6 @@ public:
     explicit Window(QWidget *parent = nullptr);
     ~Window();
 
-signals:
-
 private:
     // Menu File
     QMenu* m_menuFile;

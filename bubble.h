@@ -22,9 +22,11 @@ public:
     void mouseMoveEvent (QMouseEvent*);
     void mouseDoubleClickEvent (QMouseEvent*);
     QImage createFinalImage ();
+    void setInactive();
 
 signals:
-    void grabbed(QPoint);
+    void grabbed(QMouseEvent*, QPoint);
+    void editing();
 
 public slots:
     void resizeWidth(int value);
@@ -36,9 +38,9 @@ private:
 
     QPoint relativePos;
 
-    QTextEdit *text;
+    QTextEdit *editingText;
 
-    QLabel *editingText;
+    QLabel *printedText;
 };
 
 #endif // BUBBLE_H
