@@ -16,6 +16,16 @@ Photo::Photo(QWidget *parent) : QLabel(parent), selection(QRubberBand::Rectangle
     reversedVertically = false;
     croped = false;
 
+    setGeometry(0, 0, 10, 10);
+
+    setStyleSheet("QLabel { background-color : red; color : blue; }");
+    /*
+    QPainter painter;
+    painter.begin(this);
+    painter.fillRect(0, 0, this->width(), this->height(), QColor(Qt::red));
+    painter.end();
+    */
+
     coord.setX(0);
     coord.setY(0);
 
@@ -51,7 +61,7 @@ void Photo::loadImage()
             reversedHorizontally = false;
             reversedVertically = false;
             croped = false;
-            topLeftGrip.move(this->width()-50, this->height()-50);
+            topLeftGrip.move(this->width()/2, this->height()/2);
         }
     }
 
@@ -229,5 +239,4 @@ void Photo::crop ()
 void Photo::resizeEvent(QResizeEvent*)
 {
     setPixmap(QPixmap::fromImage(*printedImage));
-    topLeftGrip.move(this->width()-50, this->height()-50);
 }
