@@ -29,6 +29,12 @@ SubWin::SubWin(QWidget* parent) : QWidget(parent)
     sliderForImage->hide();
 
     m_painter = new QPainter;
+    m_painter->begin(page);
+    m_painter->setPen(QColor(Qt::black));
+    QRect line(100, 0, 5, page->height());
+    m_painter->fillRect(line, Qt::SolidPattern);
+    m_painter->end();
+    labPage->setPixmap(QPixmap::fromImage(*page));
 
     m_lab = new QLabel(this);
 
@@ -61,6 +67,10 @@ SubWin::~SubWin()
 
 void SubWin::save ()
 {
+    QColor color(Qt::white);
+    page->fill(color);
+    labPage->setPixmap(QPixmap::fromImage(*page));
+
     m_painter->begin(page);
     m_painter->drawImage(activePhoto->x(), activePhoto->y(), activePhoto->finalImage());
     for (int i = 0; i < tabOfPhoto.length(); i++)
@@ -176,4 +186,3 @@ void SubWin::crop ()
         sliderForImage->setValue((activePhoto->width() - MIN_IMG_SIZE_W)/35);
     }
 }
-

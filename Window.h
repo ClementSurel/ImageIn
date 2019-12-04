@@ -2,9 +2,7 @@
 #define WINDOW_H
 
 #include <QtWidgets>
-#include <QMainWindow>
 #include <QImage>
-#include <QPixmap>
 
 #include "SubWin.h"
 
@@ -17,21 +15,21 @@ public:
     ~Window();
 
 private:
-    QScrollArea *c;
     // Menu File
     QMenu* menuFile;
-    QAction* m_act_save;
+    QAction* act_save;
 
     // Menu Edit
-    QMenu* m_menuEdit;
+    QMenu* menuEdit;
     QAction *act_newPhoto;
-    QAction* m_act_reverseH;
-    QAction* m_act_reverseV;
-    QAction* m_bubble;
+    QAction* act_reverseH;
+    QAction* act_reverseV;
     QAction *act_crop;
+    QAction* act_bubble;
 
-    // central widget
-    SubWin* m_centralSubWin;
+    // Central Widget
+    QScrollArea *scroll;
+    SubWin* centralSubWin;
 };
 
 #endif // WINDOW_H
