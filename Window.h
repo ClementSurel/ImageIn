@@ -17,16 +17,18 @@ public:
     ~Window();
 
 private:
+    QScrollArea *c;
     // Menu File
-    QMenu* m_menuFile;
+    QMenu* menuFile;
     QAction* m_act_save;
-    QAction* act_load;
 
     // Menu Edit
     QMenu* m_menuEdit;
+    QAction *act_newPhoto;
     QAction* m_act_reverseH;
     QAction* m_act_reverseV;
     QAction* m_bubble;
+    QAction *act_crop;
 
     // central widget
     SubWin* m_centralSubWin;

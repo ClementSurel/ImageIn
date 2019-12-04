@@ -34,6 +34,7 @@ public slots:
 
 private:
     QImage *img;
+
     QPainter *painter;
 
     QPoint relativePos;

@@ -25,10 +25,8 @@ Bubble::Bubble(QWidget* parent) : QLabel (parent)
     painter->fillPath(path, QBrush(Qt::white));
 
     // Print a text in the bubble
-    QFont font("Comic Sans MS", 10);
+    QFont font("Comic Sans MS", 12);
     painter->setFont(font);
-    //painter->drawText(QRectF(0, 0, img->width(), img->height()), Qt::AlignCenter, "VEUX-TU DES\n CHIPS, MON\n P'TIT CANARD ?");
-
     painter->end();
 
     setPixmap(QPixmap::fromImage(*img));
