@@ -3,8 +3,10 @@
 
 #include <QtWidgets>
 
-#define MIN_IMG_SIZE_W      100
-#define MIN_IMG_SIZE_H      100
+#include "grip.h"
+
+#define MIN_IMG_SIZE_W      20
+#define MIN_IMG_SIZE_H      20
 
 class Photo : public QLabel
 {
@@ -21,6 +23,7 @@ public:
     void mousePressEvent(QMouseEvent*);
     void contextMenuEvent(QContextMenuEvent*);
     void mouseDoubleClickEvent(QMouseEvent *event);
+    void resizeEvent(QResizeEvent*);
 
 signals:
     void grabbed(QMouseEvent*, QPoint);
@@ -50,6 +53,8 @@ private:
     QMenu *contextMenu;
     QAction *act_crop;
     QAction *act_lower;
+
+    Grip topLeftGrip;
 };
 
 #endif // PHOTO_H

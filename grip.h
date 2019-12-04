@@ -1,12 +1,12 @@
 #ifndef GRIP_H
 #define GRIP_H
 
-#include <QWidget>
+#include <QtWidgets>
 
-class Grip
+class Grip : public QSizeGrip
 {
 public:
-    Grip();
+    Grip(QWidget*);
 };
 
 #endif // GRIP_H

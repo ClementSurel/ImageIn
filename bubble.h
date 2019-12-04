@@ -33,14 +33,15 @@ public slots:
     void resizeHeight(int value);
 
 private:
+    // Bubble image
     QImage *img;
-
     QPainter *painter;
 
+    // Position
     QPoint relativePos;
 
+    // Text
     QTextEdit *editingText;
-
     QLabel *printedText;
 };
 

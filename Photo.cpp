@@ -1,6 +1,6 @@
 #include "Photo.h"
 
-Photo::Photo(QWidget *parent) : QLabel(parent), selection(QRubberBand::Rectangle, this)
+Photo::Photo(QWidget *parent) : QLabel(parent), selection(QRubberBand::Rectangle, this), topLeftGrip(this)
 {
     loadedImage = new QImage;
     printedImage = new QImage;
@@ -21,6 +21,9 @@ Photo::Photo(QWidget *parent) : QLabel(parent), selection(QRubberBand::Rectangle
 
     selecting = false;
 
+    setWindowFlag(Qt::SubWindow);
+
+    connect(act_lower, SIGNAL(triggered()), this, SLOT(lower()));
     connect(act_crop, SIGNAL(triggered()), parent, SLOT(crop()));
 }
 
@@ -48,6 +51,7 @@ void Photo::loadImage()
             reversedHorizontally = false;
             reversedVertically = false;
             croped = false;
+            topLeftGrip.move(this->width()-50, this->height()-50);
         }
     }
 
@@ -154,6 +158,11 @@ void Photo::resize(int value)
     coord.setX(x());
     coord.setY(y());
 
+    if (coord.x() < 0)
+        coord.setX(0);
+    if (coord.y() < 0)
+        coord.setY(0);
+
     *printedImage = *loadedImage;
 
     if (reversedHorizontally)
@@ -166,6 +175,7 @@ void Photo::resize(int value)
         *printedImage = printedImage->copy(cropRect);
 
     *printedImage = printedImage->scaled(MIN_IMG_SIZE_W+35*value, 3508, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
     setGeometry(coord.x(), coord.y(), printedImage->width(), printedImage->height());
     setPixmap(QPixmap::fromImage(*printedImage));
 }
@@ -183,23 +193,41 @@ void Photo::crop ()
 
         selecting = false;
         selection.hide();
+
+        coord.setX(x());
+        coord.setY(y());
+
+        *printedImage = printedImage->copy(selection.x(), selection.y(), selection.width(), selection.height());
+
+        setGeometry(coord.x(), coord.y(), printedImage->width(), printedImage->height());
+        setPixmap(QPixmap::fromImage(*printedImage));
     }
     else if (selecting)
     {
+        int width = cropRect.width();
+        int height = cropRect.height();
         cropRect.setX(cropRect.x()+selection.x()*cropRect.width()/printedImage->width());
         cropRect.setY(cropRect.y()+selection.y()*cropRect.height()/printedImage->height());
-        cropRect.setWidth(selection.width()*cropRect.width()/printedImage->width());
-        cropRect.setHeight(selection.height()*cropRect.height()/printedImage->height());
+        cropRect.setWidth(selection.width()*width/printedImage->width());
+        cropRect.setHeight(selection.height()*height/printedImage->height());
 
         selecting = false;
+
+        coord.setX(x());
+        coord.setY(y());
+
+        *printedImage = printedImage->copy(selection.x(), selection.y(), selection.width(), selection.height());
+
         selection.hide();
+
+        setGeometry(coord.x(), coord.y(), printedImage->width(), printedImage->height());
+        setPixmap(QPixmap::fromImage(*printedImage));
     }
 
-    coord.setX(x());
-    coord.setY(y());
+}
 
-    *printedImage = printedImage->copy(selection.x(), selection.y(), selection.width(), selection.height());
-
-    setGeometry(coord.x(), coord.y(), printedImage->width(), printedImage->height());
+void Photo::resizeEvent(QResizeEvent*)
+{
     setPixmap(QPixmap::fromImage(*printedImage));
+    topLeftGrip.move(this->width()-50, this->height()-50);
 }
