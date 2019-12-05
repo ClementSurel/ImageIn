@@ -23,14 +23,12 @@ public:
     void mouseDoubleClickEvent (QMouseEvent*);
     QImage createFinalImage ();
     void setInactive();
+    void resizeEvent (QResizeEvent*);
+    void contextMenuEvent(QContextMenuEvent *event);
 
 signals:
     void grabbed(QMouseEvent*, QPoint);
     void editing();
-
-public slots:
-    void resizeWidth(int value);
-    void resizeHeight(int value);
 
 private:
     // Bubble image
@@ -43,6 +41,16 @@ private:
     // Text
     QTextEdit *editingText;
     QLabel *printedText;
+
+    // ContextMenu
+    QMenu *contextMenu;
+    QAction *act_raise;
+
+    // grips
+    QSizeGrip topLeftGrip;
+    QSizeGrip topRightGrip;
+    QSizeGrip downLeftGrip;
+    QSizeGrip downRightGrip;
 };
 
 #endif // BUBBLE_H

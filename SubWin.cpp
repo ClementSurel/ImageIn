@@ -13,16 +13,7 @@ SubWin::SubWin(QWidget* parent) : QWidget(parent)
     page->fill(color);
     labPage->setPixmap(QPixmap::fromImage(*page));
 
-    // Sliders
-    hSlider = new QSlider(this);
-    hSlider->setOrientation(Qt::Horizontal);
-    hSlider->setGeometry(0, 0, 100, 50);
-    hSlider->hide();
-
-    vSlider = new QSlider(this);
-    vSlider->setGeometry(0, 0, 50, 100);
-    vSlider->hide();
-
+    // Slider
     sliderForImage = new QSlider(this);
     sliderForImage->setOrientation(Qt::Horizontal);
     sliderForImage->setGeometry(80, 20, 200, 50);
@@ -36,7 +27,7 @@ SubWin::SubWin(QWidget* parent) : QWidget(parent)
     m_painter->end();
     labPage->setPixmap(QPixmap::fromImage(*page));
 
-    m_lab = new QLabel(this);
+    //m_lab = new QLabel(this);
 
     movingBubble = nullptr;
     editingBubble = nullptr;
@@ -50,9 +41,7 @@ SubWin::~SubWin()
 {
     delete m_painter;
 
-    delete m_lab;
-
-    delete hSlider;
+    //delete m_lab;
 
     for (int i = 0; i < bubbles.length(); i++)
         delete bubbles[i];
@@ -99,27 +88,9 @@ void SubWin::moveElement (QMouseEvent* event, QPoint relativePos)
 {
     QPoint point = mapFromGlobal(event->globalPos());
 
-    if (movingBubble != nullptr)
-    {
-        disconnect(hSlider, SIGNAL(valueChanged(int)), movingBubble, SLOT(resizeWidth(int)));
-        disconnect(vSlider, SIGNAL(valueChanged(int)), movingBubble, SLOT(resizeHeight(int)));
-    }
-
     movingBubble = qobject_cast<Bubble*>(sender());
 
     movingBubble->move(point.x() - relativePos.x() , point.y() - relativePos.y());
-
-    hSlider->move(movingBubble->x(), movingBubble->y()+movingBubble->height());
-    hSlider->setValue((movingBubble->width()-MIN_SIZE_W)/10);
-    hSlider->raise();
-    hSlider->show();
-    connect(hSlider, SIGNAL(valueChanged(int)), movingBubble, SLOT(resizeWidth(int)));
-
-    vSlider->move(movingBubble->x()-vSlider->width(), movingBubble->y()+movingBubble->height()-vSlider->height());
-    vSlider->setValue((movingBubble->height()-MIN_SIZE_H)/10);
-    vSlider->raise();
-    vSlider->show();
-    connect(vSlider, SIGNAL(valueChanged(int)), movingBubble, SLOT(resizeHeight(int)));
 }
 
 void SubWin::movePhoto (QMouseEvent* event, QPoint relativePos)
@@ -130,7 +101,7 @@ void SubWin::movePhoto (QMouseEvent* event, QPoint relativePos)
 
     if (activePhoto != nullptr)
     {
-        activePhoto->move(point.x() - relativePos.x() , point.y() - relativePos.y());
+        activePhoto->move(point.x() - relativePos.x(), point.y() - relativePos.y());
     }
 
     sliderForImage->move(activePhoto->x(), activePhoto->y());
@@ -175,7 +146,7 @@ void SubWin::updateEditingBubble()
 
 void SubWin::resizeWidth(int value)
 {
-    activePhoto->resize(value);
+    //activePhoto->resize(value);
 }
 
 void SubWin::crop ()

@@ -39,7 +39,7 @@ private:
     QLabel *labPage;
 
     // Images
-    QLabel *m_lab;
+    //QLabel *m_lab;
 
     Photo* activePhoto;
     QVector<Photo*> tabOfPhoto;
@@ -51,9 +51,6 @@ private:
     QVector<Bubble*> bubbles;
     Bubble *movingBubble;
     Bubble *editingBubble;
-
-    QSlider *hSlider;
-    QSlider *vSlider;
 
     QSlider *sliderForImage;
 };
