@@ -119,7 +119,7 @@ void Bubble::setInactive ()
     releaseMouse();
 }
 
-void Bubble::resizeEvent (QResizeEvent*e)
+void Bubble::resizeEvent (QResizeEvent*)
 {
     // Repaint the image
     delete img;

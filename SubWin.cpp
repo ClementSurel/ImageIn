@@ -13,12 +13,6 @@ SubWin::SubWin(QWidget* parent) : QWidget(parent)
     page->fill(color);
     labPage->setPixmap(QPixmap::fromImage(*page));
 
-    // Slider
-    sliderForImage = new QSlider(this);
-    sliderForImage->setOrientation(Qt::Horizontal);
-    sliderForImage->setGeometry(80, 20, 200, 50);
-    sliderForImage->hide();
-
     m_painter = new QPainter;
     m_painter->begin(page);
     m_painter->setPen(QColor(Qt::black));
@@ -33,23 +27,17 @@ SubWin::SubWin(QWidget* parent) : QWidget(parent)
     editingBubble = nullptr;
 
     activePhoto = nullptr;
-
-    connect(sliderForImage, SIGNAL(valueChanged(int)), this, SLOT(resizeWidth(int)));
 }
 
 SubWin::~SubWin()
 {
     delete m_painter;
 
-    //delete m_lab;
-
     for (int i = 0; i < bubbles.length(); i++)
         delete bubbles[i];
 
     for (int i = 0; i < tabOfPhoto.length(); i++)
         delete tabOfPhoto[i];
-
-    delete sliderForImage;
 
     delete page;
 }
@@ -93,23 +81,6 @@ void SubWin::moveElement (QMouseEvent* event, QPoint relativePos)
     movingBubble->move(point.x() - relativePos.x() , point.y() - relativePos.y());
 }
 
-void SubWin::movePhoto (QMouseEvent* event, QPoint relativePos)
-{
-    activePhoto = qobject_cast<Photo*>(sender());
-
-    QPoint point = mapFromGlobal(event->globalPos());
-
-    if (activePhoto != nullptr)
-    {
-        activePhoto->move(point.x() - relativePos.x(), point.y() - relativePos.y());
-    }
-
-    sliderForImage->move(activePhoto->x(), activePhoto->y());
-    sliderForImage->setValue((activePhoto->width() - MIN_IMG_SIZE_W)/35);
-    sliderForImage->raise();
-    sliderForImage->show();
-}
-
 void SubWin::addBubble()
 {
     Bubble* newBubble = new Bubble(this);
@@ -127,16 +98,12 @@ void SubWin::loadImage()
     p->loadImage();
     tabOfPhoto.push_back(p);
     activePhoto = p;
-    sliderForImage->setValue((p->width() - MIN_IMG_SIZE_W)/35);
-    connect(activePhoto, SIGNAL(grabbed(QMouseEvent*, QPoint)), this, SLOT(movePhoto(QMouseEvent*, QPoint)));
 }
 
 void SubWin::mouseDoubleClickEvent (QMouseEvent*)
 {
     if (editingBubble != nullptr)
         editingBubble->setInactive();
-
-    sliderForImage->hide();
 }
 
 void SubWin::updateEditingBubble()
@@ -144,16 +111,10 @@ void SubWin::updateEditingBubble()
     editingBubble = qobject_cast<Bubble*>(sender());
 }
 
-void SubWin::resizeWidth(int value)
-{
-    //activePhoto->resize(value);
-}
-
 void SubWin::crop ()
 {
     if (tabOfPhoto.length() > 0)
     {
         activePhoto->crop();
-        sliderForImage->setValue((activePhoto->width() - MIN_IMG_SIZE_W)/35);
     }
 }

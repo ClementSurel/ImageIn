@@ -34,18 +34,14 @@ private:
     // Bubble image
     QImage *img;
     QPainter *painter;
-
     // Position
     QPoint relativePos;
-
     // Text
     QTextEdit *editingText;
     QLabel *printedText;
-
     // ContextMenu
     QMenu *contextMenu;
     QAction *act_raise;
-
     // grips
     QSizeGrip topLeftGrip;
     QSizeGrip topRightGrip;

@@ -76,13 +76,6 @@ void Photo::loadImage()
             topRightGrip.move(width()-topRightGrip.width(), 0);
             bottomLeftGrip.move(0, height()-bottomRightGrip.height());
             bottomRightGrip.move(width()-topRightGrip.width(), height()-bottomRightGrip.height());
-
-            //setBaseSize(loadedImage->width()/10, loadedImage->height()/10);
-            //actualRect = rect();
-            //actualRect.setX(x());
-            //actualRect.setY(y());
-
-            imageRatio = loadedImage->width()/loadedImage->height();
         }
     }
 
@@ -155,7 +148,12 @@ void Photo::mouseMoveEvent(QMouseEvent *event)
     }
 
     else if (mouseButton == Qt::LeftButton)
-        emit grabbed(event, relativePos);
+    {
+        QPoint point = mapFromGlobal(event->globalPos());
+        point = mapToParent(point);
+
+        move(point.x() - relativePos.x(), point.y() - relativePos.y());
+    }
 }
 
 void Photo::mouseDoubleClickEvent(QMouseEvent *event)

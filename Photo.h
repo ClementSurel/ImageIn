@@ -62,8 +62,6 @@ private:
     Grip topRightGrip;
     Grip bottomLeftGrip;
     Grip bottomRightGrip;
-
-    //QRect actualRect;
 };
 
 #endif // PHOTO_H
