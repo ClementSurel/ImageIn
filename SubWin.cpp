@@ -72,15 +72,6 @@ void SubWin::reverseV ()
         activePhoto->reverseV();
 }
 
-void SubWin::moveElement (QMouseEvent* event, QPoint relativePos)
-{
-    QPoint point = mapFromGlobal(event->globalPos());
-
-    movingBubble = qobject_cast<Bubble*>(sender());
-
-    movingBubble->move(point.x() - relativePos.x() , point.y() - relativePos.y());
-}
-
 void SubWin::addBubble()
 {
     Bubble* newBubble = new Bubble(this);
@@ -88,7 +79,6 @@ void SubWin::addBubble()
 
     newBubble->show();
 
-    connect(newBubble, SIGNAL(grabbed(QMouseEvent*, QPoint)), this, SLOT(moveElement(QMouseEvent*, QPoint)));
     connect(newBubble, SIGNAL(editing()), this, SLOT(updateEditingBubble()));
 }
 

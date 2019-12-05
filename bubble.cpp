@@ -67,7 +67,10 @@ void Bubble::mousePressEvent (QMouseEvent* event)
 
 void Bubble::mouseMoveEvent (QMouseEvent* event)
 {
-    emit grabbed(event, relativePos);
+    QPoint point = mapFromGlobal(event->globalPos());
+    point = mapToParent(point);
+
+    move(point.x() - relativePos.x() , point.y() - relativePos.y());
 }
 
 void Bubble::mouseDoubleClickEvent (QMouseEvent *)

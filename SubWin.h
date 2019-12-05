@@ -26,7 +26,6 @@ public slots:
     void save ();
     void reverseH();
     void reverseV();
-    void moveElement(QMouseEvent*, QPoint);
     void addBubble();
     void updateEditingBubble();
     void crop();
@@ -35,9 +34,6 @@ private:
     // Page
     QImage *page;
     QLabel *labPage;
-
-    // Images
-    //QLabel *m_lab;
 
     Photo* activePhoto;
     QVector<Photo*> tabOfPhoto;

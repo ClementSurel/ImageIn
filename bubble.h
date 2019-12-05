@@ -27,7 +27,6 @@ public:
     void contextMenuEvent(QContextMenuEvent *event);
 
 signals:
-    void grabbed(QMouseEvent*, QPoint);
     void editing();
 
 private:
