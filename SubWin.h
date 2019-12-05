@@ -26,20 +26,14 @@ public slots:
     void save ();
     void reverseH();
     void reverseV();
-    void moveElement(QMouseEvent*, QPoint);
-    void movePhoto (QMouseEvent* event, QPoint relativePos);
     void addBubble();
     void updateEditingBubble();
-    void resizeWidth(int value);
     void crop();
 
 private:
     // Page
     QImage *page;
     QLabel *labPage;
-
-    // Images
-    QLabel *m_lab;
 
     Photo* activePhoto;
     QVector<Photo*> tabOfPhoto;
@@ -51,11 +45,6 @@ private:
     QVector<Bubble*> bubbles;
     Bubble *movingBubble;
     Bubble *editingBubble;
-
-    QSlider *hSlider;
-    QSlider *vSlider;
-
-    QSlider *sliderForImage;
 };
 
 #endif // SUBWIN_H

@@ -24,18 +24,19 @@ public:
     void contextMenuEvent(QContextMenuEvent*);
     void mouseDoubleClickEvent(QMouseEvent *event);
     void resizeEvent(QResizeEvent*);
+    void resizeImage(int newWidth, int newHeight);
 
 signals:
     void grabbed(QMouseEvent*, QPoint);
 
 public slots:
-    void resize(int value);
     void crop ();
+    void resizeEverything (QMouseEvent*, Grip::Corner);
 
 private:
+    // Images
     QImage *loadedImage;
     QImage *printedImage;
-    QPoint coord;
     bool reversedHorizontally;
     bool reversedVertically;
     bool croped;
@@ -52,9 +53,13 @@ private:
     // Context menu
     QMenu *contextMenu;
     QAction *act_crop;
-    QAction *act_lower;
+    //QAction *act_lower;
 
+    // grips
     Grip topLeftGrip;
+    Grip topRightGrip;
+    Grip bottomLeftGrip;
+    Grip bottomRightGrip;
 };
 
 #endif // PHOTO_H
