@@ -31,13 +31,12 @@ signals:
 
 public slots:
     void crop ();
-    void resizeFilter (QMouseEvent*, Grip::Corner);
+    void resizeEverything (QMouseEvent*, Grip::Corner);
 
 private:
     QImage *loadedImage;
     QImage *printedImage;
     QPoint coord;
-    qreal imageRatio;
     bool reversedHorizontally;
     bool reversedVertically;
     bool croped;

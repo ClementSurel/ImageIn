@@ -35,14 +35,12 @@ Photo::Photo(QWidget *parent) : QLabel(parent),
 
     locked = false;
 
-    imageRatio = 0;
-
     //connect(act_lower, SIGNAL(triggered()), this, SLOT(lower()));
     connect(act_crop, SIGNAL(triggered()), parent, SLOT(crop()));
-    connect(&topLeftGrip, SIGNAL(grabbed(QMouseEvent*, Grip::Corner)), this, SLOT(resizeFilter(QMouseEvent*, Grip::Corner)));
-    connect(&topRightGrip, SIGNAL(grabbed(QMouseEvent*, Grip::Corner)), this, SLOT(resizeFilter(QMouseEvent*, Grip::Corner)));
-    connect(&bottomLeftGrip, SIGNAL(grabbed(QMouseEvent*, Grip::Corner)), this, SLOT(resizeFilter(QMouseEvent*, Grip::Corner)));
-    connect(&bottomRightGrip, SIGNAL(grabbed(QMouseEvent*, Grip::Corner)), this, SLOT(resizeFilter(QMouseEvent*, Grip::Corner)));
+    connect(&topLeftGrip, SIGNAL(grabbed(QMouseEvent*, Grip::Corner)), this, SLOT(resizeEverything(QMouseEvent*, Grip::Corner)));
+    connect(&topRightGrip, SIGNAL(grabbed(QMouseEvent*, Grip::Corner)), this, SLOT(resizeEverything(QMouseEvent*, Grip::Corner)));
+    connect(&bottomLeftGrip, SIGNAL(grabbed(QMouseEvent*, Grip::Corner)), this, SLOT(resizeEverything(QMouseEvent*, Grip::Corner)));
+    connect(&bottomRightGrip, SIGNAL(grabbed(QMouseEvent*, Grip::Corner)), this, SLOT(resizeEverything(QMouseEvent*, Grip::Corner)));
 }
 
 Photo::~Photo()
@@ -189,17 +187,18 @@ void Photo::contextMenuEvent(QContextMenuEvent *event)
 
 void Photo::resizeImage(int newWidth, int newHeight)
 {
+    // Restart from the original image
     *printedImage = *loadedImage;
 
+    // Apply the transformation
     if (reversedHorizontally)
         *printedImage = printedImage->mirrored(true, false);
-
     if (reversedVertically)
         *printedImage = printedImage->mirrored(false, true);
-
     if (croped)
         *printedImage = printedImage->copy(cropRect);
 
+    // Rescale the image
     *printedImage = printedImage->scaled(newWidth, newHeight, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 }
 
@@ -257,17 +256,14 @@ void Photo::resizeEvent(QResizeEvent*)
     bottomRightGrip.move(width()-topRightGrip.width(), height()-bottomRightGrip.height());
 }
 
-void Photo::resizeFilter (QMouseEvent *e, Grip::Corner corner)
+void Photo::resizeEverything (QMouseEvent *e, Grip::Corner corner)
 {
     // Determinate the cursor position
     QPoint point = mapFromGlobal(e->globalPos());
     point = mapToParent(point);
 
-    // Resize the image
-    int newWidth;
-    int newHeight;
-    int newX = 0;
-    int newY = 0;
+    // Resize the image if the final image dimensions is superior to the minimun size
+    int newX, newY, newWidth, newHeight;
     switch (corner)
     {
         case Grip::topLeft:
