@@ -22,18 +22,10 @@ Photo::Photo(QWidget *parent) : QLabel(parent),
     reversedVertically = false;
     croped = false;
 
-    coord.setX(0);
-    coord.setY(0);
-
     selecting = false;
 
     setWindowFlag(Qt::SubWindow);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-    coord.setX(x());
-    coord.setY(y());
-
-    locked = false;
 
     //connect(act_lower, SIGNAL(triggered()), this, SLOT(lower()));
     connect(act_crop, SIGNAL(triggered()), parent, SLOT(crop()));
@@ -216,12 +208,12 @@ void Photo::crop ()
         selecting = false;
         selection.hide();
 
-        coord.setX(x());
-        coord.setY(y());
+        //coord.setX(x());
+        //coord.setY(y());
 
         *printedImage = printedImage->copy(selection.x(), selection.y(), selection.width(), selection.height());
 
-        setGeometry(coord.x(), coord.y(), printedImage->width(), printedImage->height());
+        setGeometry(x(), y(), printedImage->width(), printedImage->height());
         setPixmap(QPixmap::fromImage(*printedImage));
     }
     else if (selecting)
@@ -235,14 +227,14 @@ void Photo::crop ()
 
         selecting = false;
 
-        coord.setX(x());
-        coord.setY(y());
+        //coord.setX(x());
+        //coord.setY(y());
 
         *printedImage = printedImage->copy(selection.x(), selection.y(), selection.width(), selection.height());
 
         selection.hide();
 
-        setGeometry(coord.x(), coord.y(), printedImage->width(), printedImage->height());
+        setGeometry(x(), y(), printedImage->width(), printedImage->height());
         setPixmap(QPixmap::fromImage(*printedImage));
     }
 

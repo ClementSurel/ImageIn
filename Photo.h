@@ -34,14 +34,13 @@ public slots:
     void resizeEverything (QMouseEvent*, Grip::Corner);
 
 private:
+    // Images
     QImage *loadedImage;
     QImage *printedImage;
-    QPoint coord;
     bool reversedHorizontally;
     bool reversedVertically;
     bool croped;
     QRect cropRect;
-    bool locked;
 
     QPoint relativePos;
 
