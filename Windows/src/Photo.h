@@ -16,8 +16,6 @@ public:
     Photo(QWidget*);
     ~Photo();
     bool loadImage();
-    void reverseH();
-    void reverseV();
     QImage finalImage();
     void mouseMoveEvent(QMouseEvent*);
     void mousePressEvent(QMouseEvent*);
@@ -31,6 +29,8 @@ signals:
     void activated();
 
 public slots:
+    void reverseH();
+    void reverseV();
     void crop ();
     void resizeEverything (QMouseEvent*, Grip::Corner);
 
@@ -53,6 +53,8 @@ private:
 
     // Context menu
     QMenu *contextMenu;
+    QAction *act_reverseH;
+    QAction *act_reverseV;
     QAction *act_crop;
     //QAction *act_lower;
 

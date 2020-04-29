@@ -72,3 +72,7 @@ Windows/build-ImageIn-Desktop_Qt_5_12_8_MinGW_32_bit-Debug/usersclemeappdataloca
 Windows/build-ImageIn-Desktop_Qt_5_12_8_MinGW_32_bit-Debug/debug/moc_predefs.h
 Windows/build-ImageIn-Desktop_Qt_5_12_8_MinGW_32_bit-Debug/debug/ImageIn.exe
 Windows/build-ImageIn-Desktop_Qt_5_12_8_MinGW_32_bit-Debug/.qmake.stash
+Windows/ImageIn/ImageIn.pro
+Windows/build-ImageIn-Desktop_Qt_5_12_8_MinGW_32_bit-Release/release/moc_predefs.h
+Windows/build-ImageIn-Desktop_Qt_5_12_8_MinGW_32_bit-Release/.qmake.stash
+Windows/build-ImageIn-Desktop_Qt_5_12_8_MinGW_32_bit-Release/release/ImageIn.exe

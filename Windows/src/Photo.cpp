@@ -17,7 +17,11 @@ Photo::Photo(QWidget *parent) : QLabel(parent),
 
     // context menu
     contextMenu = new QMenu;
+    act_reverseH = new QAction("Reverse horizontally");
+    act_reverseV = new QAction("Reverse vertically");
     act_crop = new QAction("Crop");
+    contextMenu->addAction(act_reverseH);
+    contextMenu->addAction(act_reverseV);
     contextMenu->addAction(act_crop);
     //act_lower = new QAction("Lower");
     //contextMenu->addAction(act_lower);
@@ -34,6 +38,8 @@ Photo::Photo(QWidget *parent) : QLabel(parent),
 
     connect(this, SIGNAL(activated()), parent, SLOT(updateActivePhoto()));
     //connect(act_lower, SIGNAL(triggered()), this, SLOT(lower()));
+    connect(act_reverseH, SIGNAL(triggered()), this, SLOT(reverseH()));
+    connect(act_reverseV, SIGNAL(triggered()), this, SLOT(reverseV()));
     connect(act_crop, SIGNAL(triggered()), this, SLOT(crop()));
     connect(&topLeftGrip, SIGNAL(grabbed(QMouseEvent*, Grip::Corner)), this, SLOT(resizeEverything(QMouseEvent*, Grip::Corner)));
     connect(&topRightGrip, SIGNAL(grabbed(QMouseEvent*, Grip::Corner)), this, SLOT(resizeEverything(QMouseEvent*, Grip::Corner)));

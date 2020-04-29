@@ -49,6 +49,10 @@ void SubWin::loadImage()
         activePhoto = p;
         emit containsImage(true);
     }
+    else
+    {
+        delete p;
+    }
 }
 
 void SubWin::reverseH ()
