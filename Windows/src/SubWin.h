@@ -21,14 +21,19 @@ public:
     ~SubWin();
     void mouseDoubleClickEvent(QMouseEvent*);
 
+signals:
+    void containsImage(bool);
+
 public slots:
     void loadImage();
     void save ();
     void reverseH();
     void reverseV();
+    void crop();
+    void supprPhoto();
     void addBubble();
     void updateEditingBubble();
-    void crop();
+    void updateActivePhoto();
 
 private:
     // Page

@@ -14,6 +14,9 @@ public:
     explicit Window(QWidget *parent = nullptr);
     ~Window();
 
+public slots:
+    void activateActions(bool);
+
 private:
     // Menu File
     QMenu* menuFile;
@@ -26,6 +29,7 @@ private:
     QAction* act_reverseV;
     QAction *act_crop;
     QAction* act_bubble;
+    QAction* act_supprPhoto;
 
     // Central Widget
     QScrollArea *scroll;

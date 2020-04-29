@@ -15,7 +15,7 @@ class Photo : public QLabel
 public:
     Photo(QWidget*);
     ~Photo();
-    void loadImage();
+    bool loadImage();
     void reverseH();
     void reverseV();
     QImage finalImage();
@@ -28,6 +28,7 @@ public:
 
 signals:
     void grabbed(QMouseEvent*, QPoint);
+    void activated();
 
 public slots:
     void crop ();

@@ -43,9 +43,12 @@ SubWin::~SubWin()
 void SubWin::loadImage()
 {
     Photo* p = new Photo(this);
-    p->loadImage();
-    tabOfPhoto.push_back(p);
-    activePhoto = p;
+    if (p->loadImage())
+    {
+        tabOfPhoto.push_back(p);
+        activePhoto = p;
+        emit containsImage(true);
+    }
 }
 
 void SubWin::reverseH ()
@@ -64,6 +67,26 @@ void SubWin::crop ()
 {
     if (activePhoto != nullptr)
         activePhoto->crop();
+}
+
+void SubWin::supprPhoto ()
+{
+    for (int i = 0; i < tabOfPhoto.length(); i++)
+        if (activePhoto == tabOfPhoto[i])
+        {
+            tabOfPhoto.remove(i);
+            activePhoto->deleteLater();
+            if (tabOfPhoto.length())
+            {
+                activePhoto = tabOfPhoto[tabOfPhoto.length()-1];
+            }
+            else
+            {
+                activePhoto = nullptr;
+                emit containsImage(false);
+            }
+            break;
+        }
 }
 
 void SubWin::addBubble()
@@ -105,3 +128,9 @@ void SubWin::updateEditingBubble()
 {
     editingBubble = qobject_cast<Bubble*>(sender());
 }
+
+void SubWin::updateActivePhoto()
+{
+    activePhoto = qobject_cast<Photo*>(sender());
+}
+

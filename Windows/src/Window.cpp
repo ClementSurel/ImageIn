@@ -17,14 +17,20 @@ Window::Window(QWidget *parent) : QMainWindow(parent)
     menuEdit = new QMenu("Edit");
     act_newPhoto = new QAction("Add a new photo");
     act_reverseH = new QAction("Reverse horizontally");
+    act_reverseH->setEnabled(false);
     act_reverseV = new QAction("Reverse vertically");
+    act_reverseV->setEnabled(false);
     act_crop = new QAction("Crop");
+    act_crop->setEnabled(false);
+    act_supprPhoto = new QAction("Suppress the photo");
+    act_supprPhoto->setEnabled(false);
     act_bubble = new QAction("Add a new bubble");
 
     menuEdit->addAction(act_newPhoto);
     menuEdit->addAction(act_reverseH);
     menuEdit->addAction(act_reverseV);
     menuEdit->addAction(act_crop);
+    menuEdit->addAction(act_supprPhoto);
     menuEdit->addSeparator();
     menuEdit->addAction(act_bubble);
     menuBar()->addMenu(menuEdit);
@@ -45,7 +51,9 @@ Window::Window(QWidget *parent) : QMainWindow(parent)
     connect(act_reverseH, SIGNAL(triggered()), centralSubWin, SLOT(reverseH()));
     connect(act_reverseV, SIGNAL(triggered()), centralSubWin, SLOT(reverseV()));
     connect(act_crop, SIGNAL(triggered()), centralSubWin, SLOT(crop()));
+    connect(act_supprPhoto, SIGNAL(triggered()), centralSubWin, SLOT(supprPhoto()));
     connect(act_bubble, SIGNAL(triggered()), centralSubWin, SLOT(addBubble()));
+    connect(centralSubWin, SIGNAL(containsImage(bool)), this, SLOT(activateActions(bool)));
 }
 
 Window::~Window()
@@ -67,5 +75,20 @@ Window::~Window()
     delete scroll;
 }
 
-
-
+void Window::activateActions(bool activating)
+{
+    if (activating)
+    {
+        act_reverseH->setEnabled(true);
+        act_reverseV->setEnabled(true);
+        act_crop->setEnabled(true);
+        act_supprPhoto->setEnabled(true);
+    }
+    else
+    {
+        act_reverseH->setEnabled(false);
+        act_reverseV->setEnabled(false);
+        act_crop->setEnabled(false);
+        act_supprPhoto->setEnabled(false);
+    }
+}

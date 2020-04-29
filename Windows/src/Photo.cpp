@@ -32,8 +32,9 @@ Photo::Photo(QWidget *parent) : QLabel(parent),
     setWindowFlag(Qt::SubWindow);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+    connect(this, SIGNAL(activated()), parent, SLOT(updateActivePhoto()));
     //connect(act_lower, SIGNAL(triggered()), this, SLOT(lower()));
-    connect(act_crop, SIGNAL(triggered()), parent, SLOT(crop()));
+    connect(act_crop, SIGNAL(triggered()), this, SLOT(crop()));
     connect(&topLeftGrip, SIGNAL(grabbed(QMouseEvent*, Grip::Corner)), this, SLOT(resizeEverything(QMouseEvent*, Grip::Corner)));
     connect(&topRightGrip, SIGNAL(grabbed(QMouseEvent*, Grip::Corner)), this, SLOT(resizeEverything(QMouseEvent*, Grip::Corner)));
     connect(&bottomLeftGrip, SIGNAL(grabbed(QMouseEvent*, Grip::Corner)), this, SLOT(resizeEverything(QMouseEvent*, Grip::Corner)));
@@ -50,7 +51,7 @@ Photo::~Photo()
     delete printedImage;
 }
 
-void Photo::loadImage()
+bool Photo::loadImage()
 {
     QString fname = QFileDialog::getOpenFileName(this);
     if (fname != nullptr)
@@ -71,17 +72,24 @@ void Photo::loadImage()
             topRightGrip.move(width()-topRightGrip.width(), 0);
             bottomLeftGrip.move(0, height()-bottomRightGrip.height());
             bottomRightGrip.move(width()-topRightGrip.width(), height()-bottomRightGrip.height());
+
+            return true;
         }
     }
 
+    return false;
 }
 
 void Photo::reverseH ()
 {
-    *printedImage = printedImage->mirrored(true, false);
-    setPixmap(QPixmap::fromImage(*printedImage));
+    QImage newImage = printedImage->mirrored(true, false);
+    if (!newImage.isNull())
+    {
+        *printedImage = newImage;
+        setPixmap(QPixmap::fromImage(*printedImage));
 
-    reversedHorizontally = !reversedHorizontally;
+        reversedHorizontally = !reversedHorizontally;
+    }
 }
 
 void Photo::reverseV ()
@@ -99,6 +107,9 @@ QImage Photo::finalImage ()
 
 void Photo::mouseMoveEvent(QMouseEvent *event)
 {
+    if ( !(event->buttons() & Qt::LeftButton) )
+        return;
+
     if (selecting)
     {
         QRect selectionRect;
@@ -147,6 +158,8 @@ void Photo::mouseMoveEvent(QMouseEvent *event)
 
 void Photo::mouseDoubleClickEvent(QMouseEvent *event)
 {
+    emit activated();
+
     selecting = true;
     clickPoint.setX(event->x());
     clickPoint.setY(event->y());
@@ -155,6 +168,8 @@ void Photo::mouseDoubleClickEvent(QMouseEvent *event)
 
 void Photo::mousePressEvent (QMouseEvent *event)
 {
+    emit activated();
+
     mouseButton = event->button();
     relativePos = mapFromGlobal(event->globalPos());
 
@@ -167,10 +182,9 @@ void Photo::mousePressEvent (QMouseEvent *event)
 
 void Photo::contextMenuEvent(QContextMenuEvent *event)
 {
-    contextMenu->clear();
+    emit activated();
 
-    if (selecting)
-        contextMenu->addAction(act_crop);
+    act_crop->setEnabled (selecting ? true : false);
 
     contextMenu->move(event->globalPos());
     contextMenu->show();
@@ -178,6 +192,7 @@ void Photo::contextMenuEvent(QContextMenuEvent *event)
 
 void Photo::resizeImage(int newWidth, int newHeight)
 {
+    QImage newImage;
     // Restart from the original image
     *printedImage = *loadedImage;
 
@@ -190,7 +205,9 @@ void Photo::resizeImage(int newWidth, int newHeight)
         *printedImage = printedImage->copy(cropRect);
 
     // Rescale the image
-    *printedImage = printedImage->scaled(newWidth, newHeight, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    newImage = printedImage->scaled(newWidth, newHeight, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    if (!newImage.isNull())
+        *printedImage = newImage;
 }
 
 void Photo::crop ()
