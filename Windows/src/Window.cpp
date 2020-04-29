@@ -53,7 +53,9 @@ Window::Window(QWidget *parent) : QMainWindow(parent)
     connect(act_crop, SIGNAL(triggered()), centralSubWin, SLOT(crop()));
     connect(act_supprPhoto, SIGNAL(triggered()), centralSubWin, SLOT(supprPhoto()));
     connect(act_bubble, SIGNAL(triggered()), centralSubWin, SLOT(addBubble()));
+
     connect(centralSubWin, SIGNAL(containsImage(bool)), this, SLOT(activateActions(bool)));
+    connect(centralSubWin, SIGNAL(hasASelectingPhoto(bool)), this, SLOT(activateCropAction(bool)));
 }
 
 Window::~Window()
@@ -81,7 +83,6 @@ void Window::activateActions(bool activating)
     {
         act_reverseH->setEnabled(true);
         act_reverseV->setEnabled(true);
-        act_crop->setEnabled(true);
         act_supprPhoto->setEnabled(true);
     }
     else
@@ -91,4 +92,9 @@ void Window::activateActions(bool activating)
         act_crop->setEnabled(false);
         act_supprPhoto->setEnabled(false);
     }
+}
+
+void Window::activateCropAction(bool selecting)
+{
+    act_crop->setEnabled(selecting);
 }

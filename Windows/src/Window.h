@@ -16,6 +16,7 @@ public:
 
 public slots:
     void activateActions(bool);
+    void activateCropAction(bool);
 
 private:
     // Menu File

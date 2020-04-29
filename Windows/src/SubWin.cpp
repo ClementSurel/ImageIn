@@ -138,3 +138,7 @@ void SubWin::updateActivePhoto()
     activePhoto = qobject_cast<Photo*>(sender());
 }
 
+void SubWin::updateSelectingPhoto(bool selecting)
+{
+    emit hasASelectingPhoto(selecting);
+}

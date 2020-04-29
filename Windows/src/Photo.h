@@ -27,6 +27,7 @@ public:
 signals:
     void grabbed(QMouseEvent*, QPoint);
     void activated();
+    void isSelecting(bool);
 
 public slots:
     void reverseH();
@@ -35,6 +36,8 @@ public slots:
     void resizeEverything (QMouseEvent*, Grip::Corner);
 
 private:
+    // Properties
+    bool isActive;
     // Images
     QImage *loadedImage;
     QImage *printedImage;
@@ -56,6 +59,7 @@ private:
     QAction *act_reverseH;
     QAction *act_reverseV;
     QAction *act_crop;
+    QAction *act_suppr;
     //QAction *act_lower;
 
     // grips

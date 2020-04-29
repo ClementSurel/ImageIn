@@ -11,6 +11,7 @@ Photo::Photo(QWidget *parent) : QLabel(parent),
                                 bottomLeftGrip(this, Grip::bottomLeft),
                                 bottomRightGrip(this, Grip::bottomRight)
 {
+    isActive = true;
     // Image
     loadedImage = new QImage;
     printedImage = new QImage;
@@ -20,9 +21,11 @@ Photo::Photo(QWidget *parent) : QLabel(parent),
     act_reverseH = new QAction("Reverse horizontally");
     act_reverseV = new QAction("Reverse vertically");
     act_crop = new QAction("Crop");
+    act_suppr = new QAction("Suppress");
     contextMenu->addAction(act_reverseH);
     contextMenu->addAction(act_reverseV);
     contextMenu->addAction(act_crop);
+    contextMenu->addAction(act_suppr);
     //act_lower = new QAction("Lower");
     //contextMenu->addAction(act_lower);
 
@@ -36,7 +39,10 @@ Photo::Photo(QWidget *parent) : QLabel(parent),
     setWindowFlag(Qt::SubWindow);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+    // Connections with subwindow
+    connect(this, SIGNAL(isSelecting(bool)), parent, SLOT(updateSelectingPhoto(bool)));
     connect(this, SIGNAL(activated()), parent, SLOT(updateActivePhoto()));
+    connect(act_suppr, SIGNAL(triggered()), parent, SLOT(supprPhoto()));
     //connect(act_lower, SIGNAL(triggered()), this, SLOT(lower()));
     connect(act_reverseH, SIGNAL(triggered()), this, SLOT(reverseH()));
     connect(act_reverseV, SIGNAL(triggered()), this, SLOT(reverseV()));
@@ -111,6 +117,7 @@ QImage Photo::finalImage ()
      return *printedImage;
 }
 
+// Mouse Events
 void Photo::mouseMoveEvent(QMouseEvent *event)
 {
     if ( !(event->buttons() & Qt::LeftButton) )
@@ -152,7 +159,6 @@ void Photo::mouseMoveEvent(QMouseEvent *event)
         selection.setGeometry(selectionRect);
         selection.show();
     }
-
     else if (mouseButton == Qt::LeftButton)
     {
         QPoint point = mapFromGlobal(event->globalPos());
@@ -164,9 +170,15 @@ void Photo::mouseMoveEvent(QMouseEvent *event)
 
 void Photo::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    emit activated();
+    if (!isActive)
+    {
+        emit activated();
+        isActive = true;
+    }
 
     selecting = true;
+    emit isSelecting(true);
+
     clickPoint.setX(event->x());
     clickPoint.setY(event->y());
     selection.setGeometry(clickPoint.x(), clickPoint.y(), 0, 0);
@@ -174,7 +186,11 @@ void Photo::mouseDoubleClickEvent(QMouseEvent *event)
 
 void Photo::mousePressEvent (QMouseEvent *event)
 {
-    emit activated();
+    if (!isActive)
+    {
+        emit activated();
+        isActive = true;
+    }
 
     mouseButton = event->button();
     relativePos = mapFromGlobal(event->globalPos());
@@ -182,13 +198,18 @@ void Photo::mousePressEvent (QMouseEvent *event)
     if (event->button() == Qt::LeftButton)
     {
         selecting = false;
+        emit isSelecting(false);
         selection.hide();
     }
 }
 
 void Photo::contextMenuEvent(QContextMenuEvent *event)
 {
-    emit activated();
+    if (!isActive)
+    {
+        emit activated();
+        isActive = true;
+    }
 
     act_crop->setEnabled (selecting ? true : false);
 
@@ -196,6 +217,7 @@ void Photo::contextMenuEvent(QContextMenuEvent *event)
     contextMenu->show();
 }
 
+// Resizing methods
 void Photo::resizeImage(int newWidth, int newHeight)
 {
     QImage newImage;
@@ -230,12 +252,9 @@ void Photo::crop ()
         selecting = false;
         selection.hide();
 
-        //coord.setX(x());
-        //coord.setY(y());
-
         *printedImage = printedImage->copy(selection.x(), selection.y(), selection.width(), selection.height());
 
-        setGeometry(x(), y(), printedImage->width(), printedImage->height());
+        setGeometry(mapToParent(selection.pos()).x(), mapToParent(selection.pos()).y(), printedImage->width(), printedImage->height());
         setPixmap(QPixmap::fromImage(*printedImage));
     }
     else if (selecting)
@@ -249,14 +268,11 @@ void Photo::crop ()
 
         selecting = false;
 
-        //coord.setX(x());
-        //coord.setY(y());
-
         *printedImage = printedImage->copy(selection.x(), selection.y(), selection.width(), selection.height());
 
         selection.hide();
 
-        setGeometry(x(), y(), printedImage->width(), printedImage->height());
+        setGeometry(mapToParent(selection.pos()).x(), mapToParent(selection.pos()).y(), printedImage->width(), printedImage->height());
         setPixmap(QPixmap::fromImage(*printedImage));
     }
 

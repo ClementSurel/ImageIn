@@ -23,6 +23,7 @@ public:
 
 signals:
     void containsImage(bool);
+    void hasASelectingPhoto(bool);
 
 public slots:
     void loadImage();
@@ -34,6 +35,7 @@ public slots:
     void addBubble();
     void updateEditingBubble();
     void updateActivePhoto();
+    void updateSelectingPhoto(bool);
 
 private:
     // Page
