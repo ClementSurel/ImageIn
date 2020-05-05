@@ -11,6 +11,7 @@
 #define MIN_SIZE_H      80
 
 
+
 class Bubble : public QLabel
 {
     Q_OBJECT
@@ -18,13 +19,13 @@ class Bubble : public QLabel
 public:
     Bubble(QWidget *parent = nullptr);
     ~Bubble();
+    QImage createFinalImage ();
+    void setInactive();
     void mousePressEvent (QMouseEvent*);
     void mouseMoveEvent (QMouseEvent*);
     void mouseDoubleClickEvent (QMouseEvent*);
-    QImage createFinalImage ();
-    void setInactive();
-    void resizeEvent (QResizeEvent*);
     void contextMenuEvent(QContextMenuEvent *event);
+    void resizeEvent (QResizeEvent*);
 
 signals:
     void editing();

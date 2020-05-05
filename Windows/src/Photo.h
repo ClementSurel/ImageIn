@@ -8,6 +8,8 @@
 #define MIN_IMG_SIZE_W      20
 #define MIN_IMG_SIZE_H      20
 
+
+
 class Photo : public QLabel
 {
     Q_OBJECT
@@ -17,12 +19,12 @@ public:
     ~Photo();
     bool loadImage();
     QImage finalImage();
-    void mouseMoveEvent(QMouseEvent*);
     void mousePressEvent(QMouseEvent*);
-    void contextMenuEvent(QContextMenuEvent*);
     void mouseDoubleClickEvent(QMouseEvent *event);
-    void resizeEvent(QResizeEvent*);
+    void mouseMoveEvent(QMouseEvent*);
+    void contextMenuEvent(QContextMenuEvent*);
     void resizeImage(int newWidth, int newHeight);
+    void resizeEvent(QResizeEvent*);
 
 signals:
     void grabbed(QMouseEvent*, QPoint);
@@ -59,6 +61,7 @@ private:
     QAction *act_reverseH;
     QAction *act_reverseV;
     QAction *act_crop;
+    QAction *act_raise;
     QAction *act_suppr;
     //QAction *act_lower;
 

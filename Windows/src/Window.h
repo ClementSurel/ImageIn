@@ -6,6 +6,8 @@
 
 #include "SubWin.h"
 
+
+
 class Window : public QMainWindow
 {
     Q_OBJECT
