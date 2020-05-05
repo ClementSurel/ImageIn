@@ -139,21 +139,40 @@ void Photo::crop ()
     {
         if ( ! croped)
         {
-            cropRect.setX(selection.x()*loadedImage->width()/printedImage->width());
-            cropRect.setY(selection.y()*loadedImage->height()/printedImage->height());
-            cropRect.setWidth(selection.width()*loadedImage->width()/printedImage->width());
-            cropRect.setHeight(selection.height()*loadedImage->height()/printedImage->height());
+            int cropX = (selection.x()*loadedImage->width())/printedImage->width();
+            int cropY = (selection.y()*loadedImage->width())/printedImage->width();
+            int cropW = (selection.width()*loadedImage->width())/printedImage->width();
+            int cropH = (selection.height()*loadedImage->height())/printedImage->height();
+
+            if ( reversedHorizontally )
+                cropX = loadedImage->width()-cropX-cropW;
+
+            if ( reversedVertically )
+                cropY = loadedImage->height()-cropY-cropH;
+
+            cropRect.setX(cropX);
+            cropRect.setY(cropY);
+            cropRect.setWidth(cropW);
+            cropRect.setHeight(cropH);
 
             croped = true;
         }
         else
         {
-            int width = cropRect.width();
-            int height = cropRect.height();
-            cropRect.setX(cropRect.x()+selection.x()*cropRect.width()/printedImage->width());
-            cropRect.setY(cropRect.y()+selection.y()*cropRect.height()/printedImage->height());
-            cropRect.setWidth(selection.width()*width/printedImage->width());
-            cropRect.setHeight(selection.height()*height/printedImage->height());
+            int cropX = (selection.x()*cropRect.width())/printedImage->width();
+            int cropY = (selection.y()*cropRect.height())/printedImage->height();
+            int cropW = (selection.width()*cropRect.width())/printedImage->width();
+            int cropH = (selection.height()*cropRect.height())/printedImage->height();
+
+            if ( reversedHorizontally )
+                cropX = cropRect.width()-cropX-cropW;
+            if ( reversedVertically )
+                cropY = cropRect.height()-cropY-cropH;
+
+            cropRect.setX(cropRect.x() + cropX);
+            cropRect.setY(cropRect.y() + cropY);
+            cropRect.setWidth(cropW);
+            cropRect.setHeight(cropH);
         }
 
         selecting = false;
@@ -277,16 +296,17 @@ void Photo::contextMenuEvent(QContextMenuEvent *event)
 void Photo::resizeImage(int newWidth, int newHeight)
 {
     QImage newImage;
+
     // Restart from the original image
     *printedImage = *loadedImage;
 
     // Apply the transformation
+    if (croped)
+        *printedImage = printedImage->copy(cropRect);
     if (reversedHorizontally)
         *printedImage = printedImage->mirrored(true, false);
     if (reversedVertically)
         *printedImage = printedImage->mirrored(false, true);
-    if (croped)
-        *printedImage = printedImage->copy(cropRect);
 
     // Rescale the image
     newImage = printedImage->scaled(newWidth, newHeight, Qt::KeepAspectRatio, Qt::SmoothTransformation);
