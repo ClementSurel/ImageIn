@@ -2,6 +2,7 @@
 #define SUBWIN_H
 
 #include <QtWidgets>
+#include <QtWidgets>
 #include <QPicture>
 
 #include "Photo.h"
@@ -17,7 +18,7 @@ class SubWin : public QWidget
     Q_OBJECT
 
 public:
-    SubWin(QWidget* parent = nullptr);
+    SubWin(QScrollArea* givenScroll, QWidget* parent = nullptr);
     ~SubWin();
     void mouseDoubleClickEvent(QMouseEvent*);
 
@@ -38,6 +39,9 @@ public slots:
     void updateSelectingPhoto(bool);
 
 private:
+    // ScroolArea
+    QScrollArea* scroll;
+
     // Page
     QImage *page;
     QLabel *labPage;

@@ -2,7 +2,8 @@
 
 #include "SubWin.h"
 
-SubWin::SubWin(QWidget* parent) : QWidget(parent)
+SubWin::SubWin(QScrollArea* givenScroll, QWidget* parent) : QWidget(parent),
+                                                            scroll(givenScroll)
 {
     // Page
     labPage = new QLabel(this);
@@ -40,11 +41,18 @@ SubWin::~SubWin()
     delete labPage;
 }
 
+void SubWin::mouseDoubleClickEvent (QMouseEvent*)
+{
+    if (editingBubble != nullptr)
+        editingBubble->setInactive();
+}
+
 void SubWin::loadImage()
 {
     Photo* p = new Photo(this);
     if (p->loadImage())
     {
+        p->move(scroll->horizontalScrollBar()->value(), scroll->verticalScrollBar()->value());
         tabOfPhoto.push_back(p);
         activePhoto = p;
         emit containsImage(true);
@@ -96,6 +104,8 @@ void SubWin::supprPhoto ()
 void SubWin::addBubble()
 {
     Bubble* newBubble = new Bubble(this);
+    newBubble->move(scroll->horizontalScrollBar()->value(), scroll->verticalScrollBar()->value());
+
     bubbles.push_back(newBubble);
 
     newBubble->show();
@@ -120,12 +130,6 @@ void SubWin::save ()
         fname += ".png";
         page->save(fname, "PNG");
     }
-}
-
-void SubWin::mouseDoubleClickEvent (QMouseEvent*)
-{
-    if (editingBubble != nullptr)
-        editingBubble->setInactive();
 }
 
 void SubWin::updateEditingBubble()

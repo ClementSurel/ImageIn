@@ -1,3 +1,4 @@
+#include "SubWin.h"
 #include "Photo.h"
 
 
@@ -110,7 +111,8 @@ QImage Photo::finalImage ()
 }
 
 
-// Trnasformations
+// Transformations
+
 void Photo::reverseH ()
 {
     QImage newImage = printedImage->mirrored(true, false);
@@ -169,6 +171,7 @@ void Photo::crop ()
 
 
 // Mouse Events
+
 void Photo::mouseMoveEvent(QMouseEvent *event)
 {
     if ( !(event->buttons() & Qt::LeftButton) )
@@ -268,7 +271,9 @@ void Photo::contextMenuEvent(QContextMenuEvent *event)
     contextMenu->show();
 }
 
+
 // Resizing methods
+
 void Photo::resizeImage(int newWidth, int newHeight)
 {
     QImage newImage;

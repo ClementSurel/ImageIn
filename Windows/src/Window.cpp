@@ -38,8 +38,8 @@ Window::Window(QWidget *parent) : QMainWindow(parent)
     menuBar()->addMenu(menuEdit);
 
     // Set up the central widget
-    centralSubWin = new SubWin(this);
     scroll = new QScrollArea(this);
+    centralSubWin = new SubWin(scroll, this);
 
     scroll->setWidget(centralSubWin);
     setCentralWidget(scroll);
