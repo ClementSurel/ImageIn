@@ -5,12 +5,13 @@ Bubble::Bubble(QWidget* parent) :   QLabel (parent),
                                     topRightGrip(this),
                                     downLeftGrip(this),
                                     downRightGrip(this)
-{      
+{
     // Create the bubble image
     img = new QImage(MIN_SIZE_W, MIN_SIZE_H, QImage::Format_ARGB32);
     QColor color(Qt::transparent);
     img->fill(color);
 
+    // Create the painter object
     painter = new QPainter(img);
     painter->setRenderHints(QPainter::Antialiasing, true);
 
@@ -80,22 +81,33 @@ void Bubble::setInactive ()
     releaseMouse();
 }
 
-QImage Bubble::createFinalImage()
+QImage Bubble::createFinalImage(int ratio)
 {
     QTextOption textOp;
     textOp.setWrapMode(QTextOption::WordWrap);
     textOp.setAlignment(Qt::AlignCenter);
-    QImage finalImage(*img);
+    QImage finalImage (this->width()*100/ratio, this->height()*100/ratio, QImage::Format_ARGB32);
+    QColor color(Qt::transparent);
+    finalImage.fill(color);
+    QPainterPath path(QPointF(0, 0));
+    path.addEllipse(QRectF(10, 10, finalImage.width()-20, finalImage.height()-20));
 
     painter->begin(&finalImage);
-    painter->drawText(QRectF(editingText->x(), editingText->y(), editingText->width(), editingText->height()),
-                      editingText->toPlainText(), textOp);
+    painter->setRenderHints(QPainter::Antialiasing, true);
+    painter->setPen(Qt::black);
+    painter->drawPath(path);
+    painter->fillPath(path, QBrush(Qt::white));
+
+    painter->drawText(QRectF(editingText->x()*100/ratio, editingText->y()*100/ratio,
+                             editingText->width()*100/ratio, editingText->height()*100/ratio),
+                             editingText->toPlainText(), textOp);
     painter->end();
 
     return finalImage;
 }
 
 // Events
+
 void Bubble::mousePressEvent (QMouseEvent* event)
 {
     relativePos = mapFromGlobal(event->globalPos());
@@ -144,9 +156,9 @@ void Bubble::resizeEvent (QResizeEvent*)
     img->fill(color);
     QPainterPath path(QPointF(0, 0));
     path.addEllipse(QRectF(10, 10, img->width()-20, img->height()-20));
+
     painter->begin(img);
     painter->setRenderHints(QPainter::Antialiasing, true);
-
     painter->setPen(Qt::black);
     painter->drawPath(path);
     painter->fillPath(path, QBrush(Qt::white));
@@ -161,4 +173,11 @@ void Bubble::resizeEvent (QResizeEvent*)
     topRightGrip.move(width()-topRightGrip.width(), 0);
     downLeftGrip.move(0, height()-downLeftGrip.height());
     downRightGrip.move(width()-downRightGrip.width(), height()-downRightGrip.height());
+}
+
+// Resize
+
+void Bubble::resize(int ratio)
+{
+    setGeometry(x()*ratio/100, y()*ratio/100, img->width()*ratio/100, img->height()*ratio/100);
 }

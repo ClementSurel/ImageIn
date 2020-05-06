@@ -107,9 +107,7 @@ bool Photo::loadImage(int ratio)
 
 QImage Photo::finalImage (int zoomRatio)
 {
-    //return resizeImage(printedImage->width()*zoomRatio/100, printedImage->height()*zoomRatio/100);
     return resizeImage(printedImage->width()*100/zoomRatio, printedImage->height()*100/zoomRatio);
-    //return *printedImage;
 }
 
 

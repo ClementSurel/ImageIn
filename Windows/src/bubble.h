@@ -19,13 +19,14 @@ class Bubble : public QLabel
 public:
     Bubble(QWidget *parent = nullptr);
     ~Bubble();
-    QImage createFinalImage ();
+    QImage createFinalImage (int ratio);
     void setInactive();
     void mousePressEvent (QMouseEvent*);
     void mouseMoveEvent (QMouseEvent*);
     void mouseDoubleClickEvent (QMouseEvent*);
     void contextMenuEvent(QContextMenuEvent *event);
     void resizeEvent (QResizeEvent*);
+    void resize(int ratio);
 
 signals:
     void editing();
