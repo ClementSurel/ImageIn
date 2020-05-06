@@ -17,14 +17,15 @@ class Photo : public QLabel
 public:
     Photo(QWidget*);
     ~Photo();
-    bool loadImage();
-    QImage finalImage();
+    bool loadImage(int zoomRatio);
+    QImage finalImage(int zoomRatio);
     void mousePressEvent(QMouseEvent*);
     void mouseDoubleClickEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent*);
     void contextMenuEvent(QContextMenuEvent*);
-    void resizeImage(int newWidth, int newHeight);
+    QImage resizeImage(int newWidth, int newHeight);
     void resizeEvent(QResizeEvent*);
+    void resizeWithZoom (int ratio);
 
 signals:
     void grabbed(QMouseEvent*, QPoint);
@@ -40,9 +41,12 @@ public slots:
 private:
     // Properties
     bool isActive;
+
     // Images
     QImage *loadedImage;
     QImage *printedImage;
+
+    // Transformations
     bool reversedHorizontally;
     bool reversedVertically;
     bool croped;

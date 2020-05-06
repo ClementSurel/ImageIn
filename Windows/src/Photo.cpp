@@ -11,6 +11,7 @@ Photo::Photo(QWidget *parent) : QLabel(parent),
                                 bottomRightGrip(this, Grip::bottomRight)
 {
     isActive = true;
+
     // Image
     loadedImage = new QImage;
     printedImage = new QImage;
@@ -31,7 +32,7 @@ Photo::Photo(QWidget *parent) : QLabel(parent),
     //act_lower = new QAction("Lower");
     //contextMenu->addAction(act_lower);
 
-    // actions realised on the image
+    // image transformations
     reversedHorizontally = false;
     reversedVertically = false;
     croped = false;
@@ -76,7 +77,7 @@ Photo::~Photo()
     delete printedImage;
 }
 
-bool Photo::loadImage()
+bool Photo::loadImage(int ratio)
 {
     QString fname = QFileDialog::getOpenFileName(this);
     if (fname != nullptr)
@@ -84,8 +85,7 @@ bool Photo::loadImage()
         if (loadedImage->load(fname))
         {
             *printedImage = *loadedImage;
-            setPixmap(QPixmap::fromImage(*printedImage));
-            setGeometry(0, 0, printedImage->width(), printedImage->height());
+            resizeWithZoom(ratio);
             reversedHorizontally = false;
             reversedVertically = false;
             croped = false;
@@ -105,9 +105,11 @@ bool Photo::loadImage()
     return false;
 }
 
-QImage Photo::finalImage ()
+QImage Photo::finalImage (int zoomRatio)
 {
-     return *printedImage;
+    //return resizeImage(printedImage->width()*zoomRatio/100, printedImage->height()*zoomRatio/100);
+    return resizeImage(printedImage->width()*100/zoomRatio, printedImage->height()*100/zoomRatio);
+    //return *printedImage;
 }
 
 
@@ -166,7 +168,6 @@ void Photo::crop ()
                     printedImage->width(), printedImage->height());
         setPixmap(QPixmap::fromImage(*printedImage));
     }
-
 }
 
 
@@ -274,24 +275,25 @@ void Photo::contextMenuEvent(QContextMenuEvent *event)
 
 // Resizing methods
 
-void Photo::resizeImage(int newWidth, int newHeight)
+QImage Photo::resizeImage(int newWidth, int newHeight)
 {
-    QImage newImage;
+    QImage resizedImage;
+
     // Restart from the original image
-    *printedImage = *loadedImage;
+    resizedImage = *loadedImage;
 
     // Apply the transformation
     if (reversedHorizontally)
-        *printedImage = printedImage->mirrored(true, false);
+        resizedImage = resizedImage.mirrored(true, false);
     if (reversedVertically)
-        *printedImage = printedImage->mirrored(false, true);
+        resizedImage = resizedImage.mirrored(false, true);
     if (croped)
-        *printedImage = printedImage->copy(cropRect);
+        resizedImage = resizedImage.copy(cropRect);
 
     // Rescale the image
-    newImage = printedImage->scaled(newWidth, newHeight, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    if (!newImage.isNull())
-        *printedImage = newImage;
+    resizedImage = resizedImage.scaled(newWidth, newHeight, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+    return resizedImage;
 }
 
 void Photo::resizeEverything (QMouseEvent *e, Grip::Corner corner)
@@ -309,7 +311,7 @@ void Photo::resizeEverything (QMouseEvent *e, Grip::Corner corner)
             newHeight = y()-point.y()+height();
             if (newWidth < 60 || newHeight < 60)
                 return;
-            resizeImage(newWidth, newHeight);
+            *printedImage = resizeImage(newWidth, newHeight);
             newX = x()+width()-printedImage->width();
             newY = y()+height()-printedImage->height();
             break;
@@ -318,7 +320,7 @@ void Photo::resizeEverything (QMouseEvent *e, Grip::Corner corner)
             newHeight = y()-point.y()+height();
             if (newWidth < 60 || newHeight < 60)
                 return;
-            resizeImage(newWidth, newHeight);
+            *printedImage = resizeImage(newWidth, newHeight);
             newX = x();
             newY = y()+height()-printedImage->height();
             break;
@@ -327,7 +329,7 @@ void Photo::resizeEverything (QMouseEvent *e, Grip::Corner corner)
             newHeight = point.y()-y();
             if (newWidth < 60 || newHeight < 60)
                 return;
-            resizeImage(newWidth, newHeight);
+            *printedImage = resizeImage(newWidth, newHeight);
             newX = x()+width()-printedImage->width();
             newY = y();
             break;
@@ -336,7 +338,7 @@ void Photo::resizeEverything (QMouseEvent *e, Grip::Corner corner)
             newHeight = point.y()-y();
             if (newWidth < 60 || newHeight < 60)
                 return;
-            resizeImage(newWidth, newHeight);
+            *printedImage = resizeImage(newWidth, newHeight);
             newX = x();
             newY = y();
             break;
@@ -354,3 +356,15 @@ void Photo::resizeEvent(QResizeEvent*)
     bottomLeftGrip.move(0, height()-bottomRightGrip.height());
     bottomRightGrip.move(width()-topRightGrip.width(), height()-bottomRightGrip.height());
 }
+
+void Photo::resizeWithZoom (int ratio)
+{
+    *printedImage = resizeImage(printedImage->width()*ratio/100, printedImage->height()*ratio/100);
+
+    setGeometry(x()*ratio/100, y()*ratio/100, printedImage->width(), printedImage->height());
+
+    // Update printedImage
+    setPixmap(QPixmap::fromImage(*printedImage));
+}
+
+

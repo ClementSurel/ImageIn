@@ -88,7 +88,8 @@ QImage Bubble::createFinalImage()
     QImage finalImage(*img);
 
     painter->begin(&finalImage);
-    painter->drawText(QRectF(editingText->x(), editingText->y(), editingText->width(), editingText->height()), editingText->toPlainText(), textOp);
+    painter->drawText(QRectF(editingText->x(), editingText->y(), editingText->width(), editingText->height()),
+                      editingText->toPlainText(), textOp);
     painter->end();
 
     return finalImage;
