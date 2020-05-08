@@ -104,7 +104,7 @@ void SubWin::supprPhoto ()
 
 void SubWin::addBubble()
 {
-    Bubble* newBubble = new Bubble(this);
+    Bubble* newBubble = new Bubble(zoomRatio, this);
     newBubble->move(scroll->horizontalScrollBar()->value(), scroll->verticalScrollBar()->value());
 
     bubbles.push_back(newBubble);
@@ -121,7 +121,7 @@ void SubWin::save ()
     for (int i = 0; i < tabOfPhoto.length(); i++)
         m_painter->drawImage(tabOfPhoto[i]->x()*100/zoomRatio, tabOfPhoto[i]->y()*100/zoomRatio, tabOfPhoto[i]->finalImage(zoomRatio));
     for (int i = 0; i < bubbles.length(); i++)
-        m_painter->drawImage(bubbles[i]->x(), bubbles[i]->y(), bubbles[i]->createFinalImage(zoomRatio));
+        m_painter->drawImage(bubbles[i]->x()*100/zoomRatio, bubbles[i]->y()*100/zoomRatio, bubbles[i]->createFinalImage(zoomRatio));
     m_painter->end();
 
     // Ask user where to save the image
