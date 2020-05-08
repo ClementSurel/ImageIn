@@ -301,7 +301,7 @@ QImage Photo::resizeImage(int newWidth, int newHeight)
 
     // Apply the transformation
     if (croped)
-        resizedImage = resizedImage->copy(cropRect);
+        resizedImage = resizedImage.copy(cropRect);
     if (reversedHorizontally)
         resizedImage = resizedImage.mirrored(true, false);
     if (reversedVertically)
