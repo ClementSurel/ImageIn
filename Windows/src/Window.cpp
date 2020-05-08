@@ -37,6 +37,15 @@ Window::Window(QWidget *parent) : QMainWindow(parent)
     menuEdit->addAction(act_bubble);
     menuBar()->addMenu(menuEdit);
 
+    // Set up the View menu
+    menuView = new QMenu("View");
+    act_zoomIn = new QAction("Zoom +");
+    act_zoomOut = new QAction("Zoom -");
+
+    menuView->addAction(act_zoomIn);
+    menuView->addAction(act_zoomOut);
+    menuBar()->addMenu(menuView);
+
     // Set up the central widget
     scroll = new QScrollArea(this);
     centralSubWin = new SubWin(scroll, this);
@@ -47,7 +56,7 @@ Window::Window(QWidget *parent) : QMainWindow(parent)
     // Set geometry of the window
     setGeometry(0, 0, 800, 600);
 
-    // connections from actions to central widget
+    // connections from actions to subWin
     connect(act_save, SIGNAL(triggered()), centralSubWin, SLOT(save()));
     connect(act_newPhoto, SIGNAL(triggered()), centralSubWin, SLOT(loadImage()));
     connect(act_reverseH, SIGNAL(triggered()), centralSubWin, SLOT(reverseH()));
@@ -55,7 +64,10 @@ Window::Window(QWidget *parent) : QMainWindow(parent)
     connect(act_crop, SIGNAL(triggered()), centralSubWin, SLOT(crop()));
     connect(act_supprPhoto, SIGNAL(triggered()), centralSubWin, SLOT(supprPhoto()));
     connect(act_bubble, SIGNAL(triggered()), centralSubWin, SLOT(addBubble()));
+    connect(act_zoomIn, SIGNAL(triggered()), centralSubWin, SLOT(zoomIn()));
+    connect(act_zoomOut, SIGNAL(triggered()), centralSubWin, SLOT(zoomOut()));
 
+    // connections from subWin
     connect(centralSubWin, SIGNAL(containsImage(bool)), this, SLOT(activateActions(bool)));
     connect(centralSubWin, SIGNAL(hasASelectingPhoto(bool)), this, SLOT(activateCropAction(bool)));
 }
@@ -73,6 +85,10 @@ Window::~Window()
     delete act_crop;
     delete act_bubble;
     delete menuEdit;
+
+    // Menu View
+    delete act_zoomIn;
+    delete menuView;
 
     // central widget
     delete centralSubWin;

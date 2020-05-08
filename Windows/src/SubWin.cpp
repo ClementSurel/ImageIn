@@ -3,7 +3,8 @@
 #include "SubWin.h"
 
 SubWin::SubWin(QScrollArea* givenScroll, QWidget* parent) : QWidget(parent),
-                                                            scroll(givenScroll)
+                                                            scroll(givenScroll),
+                                                            zoomRatio(100)
 {
     // Page
     labPage = new QLabel(this);
@@ -50,7 +51,7 @@ void SubWin::mouseDoubleClickEvent (QMouseEvent*)
 void SubWin::loadImage()
 {
     Photo* p = new Photo(this);
-    if (p->loadImage())
+    if (p->loadImage(zoomRatio))
     {
         p->move(scroll->horizontalScrollBar()->value(), scroll->verticalScrollBar()->value());
         tabOfPhoto.push_back(p);
@@ -103,7 +104,7 @@ void SubWin::supprPhoto ()
 
 void SubWin::addBubble()
 {
-    Bubble* newBubble = new Bubble(this);
+    Bubble* newBubble = new Bubble(zoomRatio, this);
     newBubble->move(scroll->horizontalScrollBar()->value(), scroll->verticalScrollBar()->value());
 
     bubbles.push_back(newBubble);
@@ -118,9 +119,9 @@ void SubWin::save ()
     // Create the saved image. Draw all the photos and bubbles
     m_painter->begin(page);
     for (int i = 0; i < tabOfPhoto.length(); i++)
-        m_painter->drawImage(tabOfPhoto[i]->x(), tabOfPhoto[i]->y(), tabOfPhoto[i]->finalImage());
+        m_painter->drawImage(tabOfPhoto[i]->x()*100/zoomRatio, tabOfPhoto[i]->y()*100/zoomRatio, tabOfPhoto[i]->finalImage(zoomRatio));
     for (int i = 0; i < bubbles.length(); i++)
-        m_painter->drawImage(bubbles[i]->x(), bubbles[i]->y(), bubbles[i]->createFinalImage());
+        m_painter->drawImage(bubbles[i]->x()*100/zoomRatio, bubbles[i]->y()*100/zoomRatio, bubbles[i]->createFinalImage(zoomRatio));
     m_painter->end();
 
     // Ask user where to save the image
@@ -146,3 +147,39 @@ void SubWin::updateSelectingPhoto(bool selecting)
 {
     emit hasASelectingPhoto(selecting);
 }
+
+// Zoom
+
+void SubWin::zoomIn ()
+{
+    resizePage(true);
+}
+
+void SubWin::zoomOut()
+{
+    resizePage(false);
+}
+
+void SubWin::resizePage(bool zoomIn)
+{
+    int oldRatio = zoomRatio;
+
+    if (zoomIn)
+        zoomRatio += 10;
+    else
+        zoomRatio -= 10;
+
+    if (zoomRatio <= 0)
+    {
+        zoomRatio = oldRatio;
+        return;
+    }
+
+    setGeometry(0, 0, PAGE_W*zoomRatio/100, PAGE_H*zoomRatio/100);
+
+    for (int i = 0; i < tabOfPhoto.size(); i++)
+        tabOfPhoto[i]->resizeWithZoom(zoomRatio*100/oldRatio);
+    for (int i = 0; i < bubbles.size(); i++)
+        bubbles[i]->resize(zoomRatio*100/oldRatio);
+}
+

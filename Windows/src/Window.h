@@ -34,6 +34,11 @@ private:
     QAction* act_bubble;
     QAction* act_supprPhoto;
 
+    // Menu View
+    QAction* act_zoomIn;
+    QAction* act_zoomOut;
+    QMenu* menuView;
+
     // Central Widget
     QScrollArea *scroll;
     SubWin* centralSubWin;

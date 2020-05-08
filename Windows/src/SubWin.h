@@ -21,6 +21,7 @@ public:
     SubWin(QScrollArea* givenScroll, QWidget* parent = nullptr);
     ~SubWin();
     void mouseDoubleClickEvent(QMouseEvent*);
+    void resizePage(bool zoomIn);
 
 signals:
     void containsImage(bool);
@@ -37,10 +38,15 @@ public slots:
     void updateEditingBubble();
     void updateActivePhoto();
     void updateSelectingPhoto(bool);
+    void zoomIn();
+    void zoomOut();
 
 private:
     // ScroolArea
     QScrollArea* scroll;
+
+    // Zoom ratio
+    int zoomRatio;
 
     // Page
     QImage *page;

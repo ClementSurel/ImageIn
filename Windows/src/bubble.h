@@ -10,6 +10,7 @@
 #define MIN_SIZE_W      80
 #define MIN_SIZE_H      80
 
+#define DEFAULT_FONT_POINTSIZE  72
 
 
 class Bubble : public QLabel
@@ -17,15 +18,16 @@ class Bubble : public QLabel
     Q_OBJECT
 
 public:
-    Bubble(QWidget *parent = nullptr);
+    Bubble(int ratio, QWidget *parent = nullptr);
     ~Bubble();
-    QImage createFinalImage ();
+    QImage createFinalImage (int ratio);
     void setInactive();
     void mousePressEvent (QMouseEvent*);
     void mouseMoveEvent (QMouseEvent*);
     void mouseDoubleClickEvent (QMouseEvent*);
     void contextMenuEvent(QContextMenuEvent *event);
     void resizeEvent (QResizeEvent*);
+    void resize(int ratio);
 
 signals:
     void editing();
