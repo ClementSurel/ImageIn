@@ -386,4 +386,3 @@ void Photo::resizeWithZoom (int ratio)
     setPixmap(QPixmap::fromImage(*printedImage));
 }
 
-

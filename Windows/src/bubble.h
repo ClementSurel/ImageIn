@@ -17,38 +17,45 @@ class Bubble : public QLabel
 {
     Q_OBJECT
 
-public:
-    Bubble(int ratio, QWidget *parent = nullptr);
-    ~Bubble();
-    QImage createFinalImage (int ratio);
-    void setInactive();
-    void mousePressEvent (QMouseEvent*);
-    void mouseMoveEvent (QMouseEvent*);
-    void mouseDoubleClickEvent (QMouseEvent*);
-    void contextMenuEvent(QContextMenuEvent *event);
-    void resizeEvent (QResizeEvent*);
-    void resize(int ratio);
+    public:
 
-signals:
-    void editing();
+        Bubble(int ratio, QWidget *parent = nullptr);
+        ~Bubble();
 
-private:
-    // Bubble image
-    QImage *img;
-    QPainter *painter;
-    // Position
-    QPoint relativePos;
-    // Text
-    QTextEdit *editingText;
-    QLabel *printedText;
-    // ContextMenu
-    QMenu *contextMenu;
-    QAction *act_raise;
-    // grips
-    QSizeGrip topLeftGrip;
-    QSizeGrip topRightGrip;
-    QSizeGrip downLeftGrip;
-    QSizeGrip downRightGrip;
+        QImage createFinalImage (int ratio);
+
+        // mouse events
+        void mousePressEvent (QMouseEvent*);
+        //void mouseReleaseEvent(QMouseEvent*);
+        void mouseMoveEvent (QMouseEvent*);
+        void mouseDoubleClickEvent (QMouseEvent*);
+        void contextMenuEvent(QContextMenuEvent *event);
+        void resizeEvent (QResizeEvent*);
+        void resize(int ratio);
+
+    private:
+
+        // Painter
+        QPainter *painter;
+
+        // Bubble image
+        QImage *img;
+
+        // Text
+        QTextEdit *editingText;
+
+        // Position of the mouse when the user clicks
+        QPoint clickPosistion;
+
+        // grips
+        QSizeGrip topLeftGrip;
+        QSizeGrip topRightGrip;
+        QSizeGrip downLeftGrip;
+        QSizeGrip downRightGrip;
+
+        // ContextMenu
+        QMenu *contextMenu;
+        QAction *act_raise;
 };
 
 #endif // BUBBLE_H

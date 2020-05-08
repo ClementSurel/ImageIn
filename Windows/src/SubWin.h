@@ -20,7 +20,6 @@ class SubWin : public QWidget
 public:
     SubWin(QScrollArea* givenScroll, QWidget* parent = nullptr);
     ~SubWin();
-    void mouseDoubleClickEvent(QMouseEvent*);
     void resizePage(bool zoomIn);
 
 signals:
@@ -35,37 +34,36 @@ public slots:
     void crop();
     void supprPhoto();
     void addBubble();
-    void updateEditingBubble();
     void updateActivePhoto();
     void updateSelectingPhoto(bool);
     void zoomIn();
     void zoomOut();
 
-private:
-    // ScroolArea
-    QScrollArea* scroll;
+    private:
 
-    // Zoom ratio
-    int zoomRatio;
+        // ScroolArea
+        QScrollArea* scroll;
 
-    // Page
-    QImage *page;
-    QLabel *labPage;
+        // Zoom ratio
+        int zoomRatio;
 
-    // Photos
-    QVector<Photo*> tabOfPhoto;
-    Photo* activePhoto;
+        // Page
+        QImage *page;
+        QLabel *labPage;
 
-    // Bubbles
-    QVector<Bubble*> bubbles;
-    Bubble *movingBubble;
-    Bubble *editingBubble;
+        // Photos
+        QVector<Photo*> tabOfPhoto;
+        Photo* activePhoto;
 
-    // Painter
-    QPainter *m_painter;
+        // Bubbles
+        QVector<Bubble*> bubbles;
+        Bubble *movingBubble;
 
-    // Point where the user clicks
-    QPoint relativePos;
+        // Painter
+        QPainter *m_painter;
+
+        // Point where the user clicks
+        QPoint relativePos;
 };
 
 #endif // SUBWIN_H

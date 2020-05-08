@@ -23,7 +23,6 @@ SubWin::SubWin(QScrollArea* givenScroll, QWidget* parent) : QWidget(parent),
 
     // pointer to photo and bubble
     movingBubble = nullptr;
-    editingBubble = nullptr;
     activePhoto = nullptr;
 }
 
@@ -40,12 +39,6 @@ SubWin::~SubWin()
 
     delete page;
     delete labPage;
-}
-
-void SubWin::mouseDoubleClickEvent (QMouseEvent*)
-{
-    if (editingBubble != nullptr)
-        editingBubble->setInactive();
 }
 
 void SubWin::loadImage()
@@ -110,8 +103,6 @@ void SubWin::addBubble()
     bubbles.push_back(newBubble);
 
     newBubble->show();
-
-    connect(newBubble, SIGNAL(editing()), this, SLOT(updateEditingBubble()));
 }
 
 void SubWin::save ()
@@ -133,11 +124,6 @@ void SubWin::save ()
     }
 }
 
-void SubWin::updateEditingBubble()
-{
-    editingBubble = qobject_cast<Bubble*>(sender());
-}
-
 void SubWin::updateActivePhoto()
 {
     activePhoto = qobject_cast<Photo*>(sender());
@@ -149,7 +135,6 @@ void SubWin::updateSelectingPhoto(bool selecting)
 }
 
 // Zoom
-
 void SubWin::zoomIn ()
 {
     resizePage(true);

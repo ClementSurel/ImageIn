@@ -32,11 +32,6 @@ Bubble::Bubble(int ratio, QWidget* parent) :   QLabel (parent),
     editingText->setFont(QFont("Comic Sans MS", DEFAULT_FONT_POINTSIZE*ratio/100));
     editingText->setVisible(false);
 
-    printedText = new QLabel(this);
-    printedText->setGeometry(20, 20, img->width()-40, img->height()-40);
-    printedText->setAlignment(Qt::AlignCenter);
-    printedText->setWordWrap(true);
-
     // Set up the context Menu
     contextMenu = new QMenu(this);
     act_raise = new QAction("raise", this);
@@ -67,36 +62,9 @@ Bubble::~Bubble()
     delete img;
 
     delete editingText;
-    delete printedText;
 
     delete contextMenu;
     delete act_raise;
-}
-
-void Bubble::setInactive ()
-{
-    editingText->setVisible(false);
-    //printedText->setVisible(true);
-
-    //printedText->setText(editingText->toPlainText());
-    painter->begin(img);
-    painter->setFont(editingText->font());
-    painter->setPen(Qt::green);
-
-    QTextOption textOp;
-    textOp.setWrapMode(QTextOption::WordWrap);
-    textOp.setAlignment(Qt::AlignCenter);
-
-    painter->drawText(QRectF(editingText->x(), editingText->y(),
-                             editingText->width(), editingText->height()),
-                             editingText->toPlainText(), textOp);
-
-    painter->end();
-
-    setPixmap(QPixmap::fromImage(*img));
-
-    editingText->releaseKeyboard();
-    releaseMouse();
 }
 
 QImage Bubble::createFinalImage(int ratio)
@@ -140,26 +108,60 @@ QImage Bubble::createFinalImage(int ratio)
 }
 
 // Mouse events
-
-void Bubble::mousePressEvent (QMouseEvent* event)
+void Bubble::mousePressEvent (QMouseEvent *event)
 {
-    relativePos = mapFromGlobal(event->globalPos());
+    clickPosistion = mapFromGlobal(event->globalPos());
 }
 
-void Bubble::mouseMoveEvent (QMouseEvent* event)
+/*
+void Bubble::mouseReleaseEvent (QMouseEvent *event)
+{
+    event->setAccepted(true);
+
+    editingText->setVisible(false);
+
+    // Repaint the image
+    // Draw the bubble
+    QPainterPath path(QPointF(0, 0));
+    path.addEllipse(QRectF(10, 10, img->width()-20, img->height()-20));
+
+    painter->begin(img);
+    painter->setRenderHints(QPainter::Antialiasing, true);
+    painter->setPen(Qt::black);
+    painter->drawPath(path);
+    painter->fillPath(path, QBrush(Qt::white));
+
+    // Draw the text
+    painter->setFont(editingText->font());
+
+    QTextOption textOp;
+    textOp.setWrapMode(QTextOption::WordWrap);
+    textOp.setAlignment(Qt::AlignCenter);
+
+    painter->drawText(QRectF(editingText->x(), editingText->y(),
+                             editingText->width(), editingText->height()),
+                             editingText->toPlainText(), textOp);
+
+    painter->end();
+
+    setPixmap(QPixmap::fromImage(*img));
+}
+*/
+
+void Bubble::mouseMoveEvent (QMouseEvent *event)
 {
     QPoint point = mapFromGlobal(event->globalPos());
     point = mapToParent(point);
 
-    move(point.x() - relativePos.x() , point.y() - relativePos.y());
+    move(point.x() - clickPosistion.x() , point.y() - clickPosistion.y());
 }
 
-void Bubble::mouseDoubleClickEvent (QMouseEvent *)
+void Bubble::mouseDoubleClickEvent (QMouseEvent *event)
 {
+    event->setAccepted(true);
+
     if (editingText->isVisible() == false)
     {
-        emit editing();
-        printedText->setVisible(false);
         editingText->setVisible(true);
         grabMouse();
         editingText->grabKeyboard();
@@ -167,8 +169,6 @@ void Bubble::mouseDoubleClickEvent (QMouseEvent *)
     else
     {
         editingText->setVisible(false);
-        //printedText->setVisible(true);
-        //printedText->setText(editingText->toPlainText());
 
         // Repaint the image
         // Draw the bubble
@@ -242,7 +242,6 @@ void Bubble::resizeEvent (QResizeEvent*)
 
     // Resize and reposition the text
     editingText->setGeometry(20, 20, img->width()-40, img->height()-40);
-    printedText->setGeometry(20, 20, img->width()-40, img->height()-40);
 
     // Draw the text
     painter->drawText(QRectF(editingText->x(), editingText->y(),
@@ -259,6 +258,4 @@ void Bubble::resizeEvent (QResizeEvent*)
     downLeftGrip.move(0, height()-downLeftGrip.height());
     downRightGrip.move(width()-downRightGrip.width(), height()-downRightGrip.height());
 }
-
-
 
