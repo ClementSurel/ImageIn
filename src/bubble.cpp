@@ -1,16 +1,16 @@
 #include "bubble.h"
 
-Bubble::Bubble(int ratio, QWidget* parent) :   QLabel (parent),
-                                              topLeftGrip(this),
-                                              topRightGrip(this),
-                                              downLeftGrip(this),
-                                              downRightGrip(this)
+Bubble::Bubble(int x, int y, int ratio, QWidget* parent) :  QLabel (parent),
+                                                            topLeftGrip(this),
+                                                            topRightGrip(this),
+                                                            downLeftGrip(this),
+                                                            downRightGrip(this)
 {
     // Create the painter object
     painter = new QPainter;
 
     // Draw the bubble image
-    img = new QImage(MIN_SIZE_W, MIN_SIZE_H, QImage::Format_ARGB32);
+    img = new QImage(NATIVE_SIZE_W, NATIVE_SIZE_H, QImage::Format_ARGB32);
 
     QColor color(Qt::transparent);
     img->fill(color);
@@ -42,12 +42,19 @@ Bubble::Bubble(int ratio, QWidget* parent) :   QLabel (parent),
     // Set up the widget properties
     setWindowFlag(Qt::SubWindow);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    setMinimumSize(MIN_SIZE_W, MIN_SIZE_H);
+    setMinimumSize(80, 80);
 
     // Display the bubble image
     setPixmap(QPixmap::fromImage(*img));
     setGeometry(0, 0, img->width(), img->height());
     show();
+
+    zoom = ratio;
+
+    realX = x*100/zoom;
+    realY = y*100/zoom;
+    realWidth = width()*100/zoom;
+    realHeight = height()*100/zoom;
 
     // Position the grips
     topLeftGrip.move(0, 0);
@@ -210,13 +217,16 @@ void Bubble::contextMenuEvent(QContextMenuEvent *event)
 // Resize
 void Bubble::resize(int ratio)
 {
+    zoom = ratio;
+
     // Change the font pointsize
     QFont newFont = editingText->font();
-    newFont.setPointSize(newFont.pointSize()*ratio/100);
+    //newFont.setPointSize(DEFAULT_FONT_POINTSIZE*zoom/100);
+    newFont.setPointSize(newFont.pointSize()*zoom/100);
     editingText->setFont(newFont);
 
     // Resize everything
-    setGeometry(x()*ratio/100, y()*ratio/100, img->width()*ratio/100, img->height()*ratio/100);
+    setGeometry(realX*zoom/100, realY*zoom/100, realWidth*zoom/100, realHeight*zoom/100);
 }
 
 void Bubble::resizeEvent (QResizeEvent*)
@@ -251,6 +261,11 @@ void Bubble::resizeEvent (QResizeEvent*)
     painter->end();
 
     setPixmap(QPixmap::fromImage(*img));
+
+    realX = x()*100/zoom;
+    realY = y()*100/zoom;
+    realWidth = width()*100/zoom;
+    realHeight = height()*100/zoom;
 
     // Reposition grips
     topLeftGrip.move(0, 0);

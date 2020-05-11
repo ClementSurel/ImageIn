@@ -50,7 +50,7 @@ Window::Window(QWidget *parent) : QMainWindow(parent)
     toolBar = new QToolBar(this);
 
     zoomSlider = new QSlider(Qt::Horizontal, this);
-    zoomSlider->setMinimum(20);
+    zoomSlider->setMinimum(15);
     zoomSlider->setValue(100);
 
     toolBar->addWidget(zoomSlider);

@@ -44,9 +44,11 @@ SubWin::~SubWin()
 void SubWin::loadImage()
 {
     Photo* p = new Photo(this);
-    if (p->loadImage(zoomRatio))
+    int x = scroll->horizontalScrollBar()->value();
+    int y = scroll->verticalScrollBar()->value();
+
+    if (p->loadImage(x, y, zoomRatio))
     {
-        p->move(scroll->horizontalScrollBar()->value(), scroll->verticalScrollBar()->value());
         tabOfPhoto.push_back(p);
         activePhoto = p;
         emit containsImage(true);
@@ -95,13 +97,16 @@ void SubWin::supprPhoto ()
         }
 }
 
+
 void SubWin::addBubble()
 {
-    Bubble* newBubble = new Bubble(zoomRatio, this);
-    newBubble->move(scroll->horizontalScrollBar()->value(), scroll->verticalScrollBar()->value());
+    int x = scroll->horizontalScrollBar()->value();
+    int y = scroll->verticalScrollBar()->value();
+    Bubble* newBubble = new Bubble(x, y, zoomRatio, this);
 
     bubbles.push_back(newBubble);
 
+    newBubble->move(x, y);
     newBubble->show();
 }
 
@@ -163,28 +168,24 @@ void SubWin::resizePage(bool zoomIn)
     setGeometry(0, 0, PAGE_W*zoomRatio/100, PAGE_H*zoomRatio/100);
 
     for (int i = 0; i < tabOfPhoto.size(); i++)
-        tabOfPhoto[i]->resizeWithZoom(zoomRatio*100/oldRatio);
+        tabOfPhoto[i]->resizeWithZoom(zoomRatio);
 
     for (int i = 0; i < bubbles.size(); i++)
-        bubbles[i]->resize(zoomRatio*100/oldRatio);
+        bubbles[i]->resize(zoomRatio);
 }
 
 void SubWin::resizePage(int value)
 {
     zoomRatio = value;
 
-    int oldWidth = this->width();
-
     setGeometry(0, 0, PAGE_W*zoomRatio/100, PAGE_H*zoomRatio/100);
-
-    int ratio = this->width()*100/oldWidth;
 
     for (int i = 0; i < tabOfPhoto.size(); i++)
         //tabOfPhoto[i]->resizeWithZoom(zoomRatio*100/oldRatio);
-        tabOfPhoto[i]->resizeWithZoom(ratio);
+        tabOfPhoto[i]->resizeWithZoom(zoomRatio);
 
     for (int i = 0; i < bubbles.size(); i++)
         //bubbles[i]->resize(zoomRatio*100/oldRatio);
-        bubbles[i]->resize(ratio);
+        bubbles[i]->resize(zoomRatio);
 }
 
