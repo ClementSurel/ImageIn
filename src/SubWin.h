@@ -38,6 +38,7 @@ public slots:
     void updateSelectingPhoto(bool);
     void zoomIn();
     void zoomOut();
+    void resizePage(int value);
 
     private:
 

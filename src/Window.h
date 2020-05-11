@@ -6,6 +6,8 @@
 
 #include "SubWin.h"
 
+
+
 class Window : public QMainWindow
 {
     Q_OBJECT
@@ -13,6 +15,10 @@ class Window : public QMainWindow
 public:
     explicit Window(QWidget *parent = nullptr);
     ~Window();
+
+public slots:
+    void activateActions(bool);
+    void activateCropAction(bool);
 
 private:
     // Menu File
@@ -26,6 +32,16 @@ private:
     QAction* act_reverseV;
     QAction *act_crop;
     QAction* act_bubble;
+    QAction* act_supprPhoto;
+
+    // Menu View
+    QAction* act_zoomIn;
+    QAction* act_zoomOut;
+    QMenu* menuView;
+
+    // Tool bar
+    QToolBar *toolBar;
+    QSlider *zoomSlider;
 
     // Central Widget
     QScrollArea *scroll;

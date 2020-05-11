@@ -164,7 +164,27 @@ void SubWin::resizePage(bool zoomIn)
 
     for (int i = 0; i < tabOfPhoto.size(); i++)
         tabOfPhoto[i]->resizeWithZoom(zoomRatio*100/oldRatio);
+
     for (int i = 0; i < bubbles.size(); i++)
         bubbles[i]->resize(zoomRatio*100/oldRatio);
+}
+
+void SubWin::resizePage(int value)
+{
+    zoomRatio = value;
+
+    int oldWidth = this->width();
+
+    setGeometry(0, 0, PAGE_W*zoomRatio/100, PAGE_H*zoomRatio/100);
+
+    int ratio = this->width()*100/oldWidth;
+
+    for (int i = 0; i < tabOfPhoto.size(); i++)
+        //tabOfPhoto[i]->resizeWithZoom(zoomRatio*100/oldRatio);
+        tabOfPhoto[i]->resizeWithZoom(ratio);
+
+    for (int i = 0; i < bubbles.size(); i++)
+        //bubbles[i]->resize(zoomRatio*100/oldRatio);
+        bubbles[i]->resize(ratio);
 }
 

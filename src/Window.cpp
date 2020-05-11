@@ -46,6 +46,16 @@ Window::Window(QWidget *parent) : QMainWindow(parent)
     menuView->addAction(act_zoomOut);
     menuBar()->addMenu(menuView);
 
+    // Set up the tool bar
+    toolBar = new QToolBar(this);
+
+    zoomSlider = new QSlider(Qt::Horizontal, this);
+    zoomSlider->setMinimum(20);
+    zoomSlider->setValue(100);
+
+    toolBar->addWidget(zoomSlider);
+    addToolBar(toolBar);
+
     // Set up the central widget
     scroll = new QScrollArea(this);
     centralSubWin = new SubWin(scroll, this);
@@ -66,6 +76,9 @@ Window::Window(QWidget *parent) : QMainWindow(parent)
     connect(act_bubble, SIGNAL(triggered()), centralSubWin, SLOT(addBubble()));
     connect(act_zoomIn, SIGNAL(triggered()), centralSubWin, SLOT(zoomIn()));
     connect(act_zoomOut, SIGNAL(triggered()), centralSubWin, SLOT(zoomOut()));
+
+    // connections from toolBar widgets to SubWin
+    connect(zoomSlider, SIGNAL(valueChanged(int)), centralSubWin, SLOT(resizePage(int)));
 
     // connections from subWin
     connect(centralSubWin, SIGNAL(containsImage(bool)), this, SLOT(activateActions(bool)));
@@ -89,6 +102,10 @@ Window::~Window()
     // Menu View
     delete act_zoomIn;
     delete menuView;
+
+    // Tool Bar
+    delete zoomSlider;
+    delete toolBar;
 
     // central widget
     delete centralSubWin;

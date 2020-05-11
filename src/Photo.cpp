@@ -1,5 +1,7 @@
-#include <iostream>
+#include "SubWin.h"
 #include "Photo.h"
+
+
 
 Photo::Photo(QWidget *parent) : QLabel(parent),
                                 selection(QRubberBand::Rectangle, this),
@@ -8,27 +10,53 @@ Photo::Photo(QWidget *parent) : QLabel(parent),
                                 bottomLeftGrip(this, Grip::bottomLeft),
                                 bottomRightGrip(this, Grip::bottomRight)
 {
+    isActive = true;
+
+    // Image
     loadedImage = new QImage;
     printedImage = new QImage;
 
-    // QActions
+    // context menu
     contextMenu = new QMenu;
+    act_reverseH = new QAction("Reverse horizontally");
+    act_reverseV = new QAction("Reverse vertically");
     act_crop = new QAction("Crop");
-    //act_lower = new QAction("Lower");
+    act_raise = new QAction("Raise");
+    act_suppr = new QAction("Suppress");
+
+    contextMenu->addAction(act_reverseH);
+    contextMenu->addAction(act_reverseV);
     contextMenu->addAction(act_crop);
+    contextMenu->addAction(act_raise);
+    contextMenu->addAction(act_suppr);
+    //act_lower = new QAction("Lower");
     //contextMenu->addAction(act_lower);
 
+    // image transformations
     reversedHorizontally = false;
     reversedVertically = false;
     croped = false;
 
+    // selection
     selecting = false;
 
+    // Set up widget properties
     setWindowFlag(Qt::SubWindow);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+    // Connections with subwindow
+    connect(this, SIGNAL(isSelecting(bool)), parent, SLOT(updateSelectingPhoto(bool)));
+    connect(this, SIGNAL(activated()), parent, SLOT(updateActivePhoto()));
+
+    // Connections between actions of the context menu and the corresponding functions
+    connect(act_reverseH, SIGNAL(triggered()), this, SLOT(reverseH()));
+    connect(act_reverseV, SIGNAL(triggered()), this, SLOT(reverseV()));
+    connect(act_crop, SIGNAL(triggered()), this, SLOT(crop()));
+    connect(act_raise, SIGNAL(triggered()), this, SLOT(raise()));
     //connect(act_lower, SIGNAL(triggered()), this, SLOT(lower()));
-    connect(act_crop, SIGNAL(triggered()), parent, SLOT(crop()));
+    connect(act_suppr, SIGNAL(triggered()), parent, SLOT(supprPhoto()));
+
+    // Connections between grips and the image
     connect(&topLeftGrip, SIGNAL(grabbed(QMouseEvent*, Grip::Corner)), this, SLOT(resizeEverything(QMouseEvent*, Grip::Corner)));
     connect(&topRightGrip, SIGNAL(grabbed(QMouseEvent*, Grip::Corner)), this, SLOT(resizeEverything(QMouseEvent*, Grip::Corner)));
     connect(&bottomLeftGrip, SIGNAL(grabbed(QMouseEvent*, Grip::Corner)), this, SLOT(resizeEverything(QMouseEvent*, Grip::Corner)));
@@ -37,49 +65,64 @@ Photo::Photo(QWidget *parent) : QLabel(parent),
 
 Photo::~Photo()
 {
+    delete act_reverseH;
+    delete act_reverseV;
     //delete act_lower;
     delete act_crop;
+    delete act_raise;
+    delete act_suppr;
     delete contextMenu;
 
     delete loadedImage;
     delete printedImage;
 }
 
-void Photo::loadImage()
+bool Photo::loadImage(int ratio)
 {
     QString fname = QFileDialog::getOpenFileName(this);
-
     if (fname != nullptr)
     {
         if (loadedImage->load(fname))
         {
             *printedImage = *loadedImage;
-            setPixmap(QPixmap::fromImage(*printedImage));
-            setGeometry(0, 0, printedImage->width(), printedImage->height());
-            show();
+            resizeWithZoom(ratio);
             reversedHorizontally = false;
             reversedVertically = false;
             croped = false;
+
+            show();
 
             // grip positions
             topLeftGrip.move(0, 0);
             topRightGrip.move(width()-topRightGrip.width(), 0);
             bottomLeftGrip.move(0, height()-bottomRightGrip.height());
             bottomRightGrip.move(width()-topRightGrip.width(), height()-bottomRightGrip.height());
+
+            return true;
         }
     }
 
+    return false;
 }
+
+QImage Photo::finalImage (int zoomRatio)
+{
+    return resizeImage(printedImage->width()*100/zoomRatio, printedImage->height()*100/zoomRatio);
+}
+
+
+// Transformations
 
 void Photo::reverseH ()
 {
-    *printedImage = printedImage->mirrored(true, false);
-    setPixmap(QPixmap::fromImage(*printedImage));
+    QImage newImage = printedImage->mirrored(true, false);
+    if (!newImage.isNull())
+    {
+        *printedImage = newImage;
+        setPixmap(QPixmap::fromImage(*printedImage));
 
-    if (reversedHorizontally)
-        reversedHorizontally = false;
-    else
-        reversedHorizontally = true;
+        reversedHorizontally = !reversedHorizontally;
+    }
 }
 
 void Photo::reverseV ()
@@ -87,19 +130,71 @@ void Photo::reverseV ()
     *printedImage = printedImage->mirrored(false, true);
     setPixmap(QPixmap::fromImage(*printedImage));
 
-    if (reversedVertically)
-        reversedVertically = false;
-    else
-        reversedVertically = true;
+    reversedVertically = !reversedVertically;
 }
 
-QImage Photo::finalImage ()
+void Photo::crop ()
 {
-     return *printedImage;
+    if (selecting)
+    {
+        if ( ! croped)
+        {
+            int cropX = (selection.x()*loadedImage->width())/printedImage->width();
+            int cropY = (selection.y()*loadedImage->width())/printedImage->width();
+            int cropW = (selection.width()*loadedImage->width())/printedImage->width();
+            int cropH = (selection.height()*loadedImage->height())/printedImage->height();
+
+            if ( reversedHorizontally )
+                cropX = loadedImage->width()-cropX-cropW;
+
+            if ( reversedVertically )
+                cropY = loadedImage->height()-cropY-cropH;
+
+            cropRect.setX(cropX);
+            cropRect.setY(cropY);
+            cropRect.setWidth(cropW);
+            cropRect.setHeight(cropH);
+
+            croped = true;
+        }
+        else
+        {
+            int cropX = (selection.x()*cropRect.width())/printedImage->width();
+            int cropY = (selection.y()*cropRect.height())/printedImage->height();
+            int cropW = (selection.width()*cropRect.width())/printedImage->width();
+            int cropH = (selection.height()*cropRect.height())/printedImage->height();
+
+            if ( reversedHorizontally )
+                cropX = cropRect.width()-cropX-cropW;
+            if ( reversedVertically )
+                cropY = cropRect.height()-cropY-cropH;
+
+            cropRect.setX(cropRect.x() + cropX);
+            cropRect.setY(cropRect.y() + cropY);
+            cropRect.setWidth(cropW);
+            cropRect.setHeight(cropH);
+        }
+
+        selecting = false;
+        emit isSelecting(false);
+        selection.hide();
+
+        *printedImage = printedImage->copy(selection.x(), selection.y(), selection.width(), selection.height());
+
+        setGeometry(mapToParent(selection.pos()).x(), mapToParent(selection.pos()).y(),
+                    printedImage->width(), printedImage->height());
+        setPixmap(QPixmap::fromImage(*printedImage));
+    }
 }
+
+
+// Mouse Events
 
 void Photo::mouseMoveEvent(QMouseEvent *event)
 {
+    if ( !(event->buttons() & Qt::LeftButton) )
+        return;
+
     if (selecting)
     {
         QRect selectionRect;
@@ -136,7 +231,6 @@ void Photo::mouseMoveEvent(QMouseEvent *event)
         selection.setGeometry(selectionRect);
         selection.show();
     }
-
     else if (mouseButton == Qt::LeftButton)
     {
         QPoint point = mapFromGlobal(event->globalPos());
@@ -148,7 +242,15 @@ void Photo::mouseMoveEvent(QMouseEvent *event)
 
 void Photo::mouseDoubleClickEvent(QMouseEvent *event)
 {
+    if (!isActive)
+    {
+        emit activated();
+        isActive = true;
+    }
+
     selecting = true;
+    emit isSelecting(true);
+
     clickPoint.setX(event->x());
     clickPoint.setY(event->y());
     selection.setGeometry(clickPoint.x(), clickPoint.y(), 0, 0);
@@ -156,96 +258,61 @@ void Photo::mouseDoubleClickEvent(QMouseEvent *event)
 
 void Photo::mousePressEvent (QMouseEvent *event)
 {
+    if (!isActive)
+    {
+        emit activated();
+        isActive = true;
+    }
+
     mouseButton = event->button();
     relativePos = mapFromGlobal(event->globalPos());
 
     if (event->button() == Qt::LeftButton)
     {
         selecting = false;
+        emit isSelecting(false);
         selection.hide();
     }
 }
 
 void Photo::contextMenuEvent(QContextMenuEvent *event)
 {
-    contextMenu->clear();
+    if (!isActive)
+    {
+        emit activated();
+        isActive = true;
+    }
 
-    if (selecting)
-           contextMenu->addAction(act_crop);
+    act_crop->setEnabled (selecting ? true : false);
 
     contextMenu->move(event->globalPos());
     contextMenu->show();
 }
 
-void Photo::resizeImage(int newWidth, int newHeight)
+
+// Resizing methods
+
+QImage Photo::resizeImage(int newWidth, int newHeight)
 {
+    QImage resizedImage;
+
     // Restart from the original image
-    *printedImage = *loadedImage;
+    resizedImage = *loadedImage;
 
     // Apply the transformation
-    if (reversedHorizontally)
-        *printedImage = printedImage->mirrored(true, false);
-    if (reversedVertically)
-        *printedImage = printedImage->mirrored(false, true);
     if (croped)
-        *printedImage = printedImage->copy(cropRect);
+        resizedImage = resizedImage.copy(cropRect);
+    if (reversedHorizontally)
+        resizedImage = resizedImage.mirrored(true, false);
+    if (reversedVertically)
+        resizedImage = resizedImage.mirrored(false, true);
+    if (croped)
+        resizedImage = resizedImage.copy(cropRect);
 
     // Rescale the image
-    *printedImage = printedImage->scaled(newWidth, newHeight, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-}
+    resizedImage = resizedImage.scaled(newWidth, newHeight, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
-void Photo::crop ()
-{
-    if ( ! croped && selecting)
-    {
-        cropRect.setX(selection.x()*loadedImage->width()/printedImage->width());
-        cropRect.setY(selection.y()*loadedImage->height()/printedImage->height());
-        cropRect.setWidth(selection.width()*loadedImage->width()/printedImage->width());
-        cropRect.setHeight(selection.height()*loadedImage->height()/printedImage->height());
-
-        croped = true;
-
-        selecting = false;
-        selection.hide();
-
-        //coord.setX(x());
-        //coord.setY(y());
-
-        *printedImage = printedImage->copy(selection.x(), selection.y(), selection.width(), selection.height());
-
-        setGeometry(x(), y(), printedImage->width(), printedImage->height());
-        setPixmap(QPixmap::fromImage(*printedImage));
-    }
-    else if (selecting)
-    {
-        int width = cropRect.width();
-        int height = cropRect.height();
-        cropRect.setX(cropRect.x()+selection.x()*cropRect.width()/printedImage->width());
-        cropRect.setY(cropRect.y()+selection.y()*cropRect.height()/printedImage->height());
-        cropRect.setWidth(selection.width()*width/printedImage->width());
-        cropRect.setHeight(selection.height()*height/printedImage->height());
-
-        selecting = false;
-
-        //coord.setX(x());
-        //coord.setY(y());
-
-        *printedImage = printedImage->copy(selection.x(), selection.y(), selection.width(), selection.height());
-
-        selection.hide();
-
-        setGeometry(x(), y(), printedImage->width(), printedImage->height());
-        setPixmap(QPixmap::fromImage(*printedImage));
-    }
-
-}
-
-void Photo::resizeEvent(QResizeEvent*)
-{
-    topLeftGrip.move(0, 0);
-    topRightGrip.move(width()-topRightGrip.width(), 0);
-    bottomLeftGrip.move(0, height()-bottomRightGrip.height());
-    bottomRightGrip.move(width()-topRightGrip.width(), height()-bottomRightGrip.height());
+    return resizedImage;
 }
 
 void Photo::resizeEverything (QMouseEvent *e, Grip::Corner corner)
@@ -263,7 +330,7 @@ void Photo::resizeEverything (QMouseEvent *e, Grip::Corner corner)
             newHeight = y()-point.y()+height();
             if (newWidth < 60 || newHeight < 60)
                 return;
-            resizeImage(newWidth, newHeight);
+            *printedImage = resizeImage(newWidth, newHeight);
             newX = x()+width()-printedImage->width();
             newY = y()+height()-printedImage->height();
             break;
@@ -272,7 +339,7 @@ void Photo::resizeEverything (QMouseEvent *e, Grip::Corner corner)
             newHeight = y()-point.y()+height();
             if (newWidth < 60 || newHeight < 60)
                 return;
-            resizeImage(newWidth, newHeight);
+            *printedImage = resizeImage(newWidth, newHeight);
             newX = x();
             newY = y()+height()-printedImage->height();
             break;
@@ -281,7 +348,7 @@ void Photo::resizeEverything (QMouseEvent *e, Grip::Corner corner)
             newHeight = point.y()-y();
             if (newWidth < 60 || newHeight < 60)
                 return;
-            resizeImage(newWidth, newHeight);
+            *printedImage = resizeImage(newWidth, newHeight);
             newX = x()+width()-printedImage->width();
             newY = y();
             break;
@@ -290,7 +357,7 @@ void Photo::resizeEverything (QMouseEvent *e, Grip::Corner corner)
             newHeight = point.y()-y();
             if (newWidth < 60 || newHeight < 60)
                 return;
-            resizeImage(newWidth, newHeight);
+            *printedImage = resizeImage(newWidth, newHeight);
             newX = x();
             newY = y();
             break;
@@ -300,3 +367,23 @@ void Photo::resizeEverything (QMouseEvent *e, Grip::Corner corner)
     // Update printedImage
     setPixmap(QPixmap::fromImage(*printedImage));
 }
+
+void Photo::resizeEvent(QResizeEvent*)
+{
+    // Reposition the grips
+    topLeftGrip.move(0, 0);
+    topRightGrip.move(width()-topRightGrip.width(), 0);
+    bottomLeftGrip.move(0, height()-bottomRightGrip.height());
+    bottomRightGrip.move(width()-topRightGrip.width(), height()-bottomRightGrip.height());
+}
+
+void Photo::resizeWithZoom (int ratio)
+{
+    *printedImage = resizeImage(printedImage->width()*ratio/100, printedImage->height()*ratio/100);
+
+    setGeometry(x()*ratio/100, y()*ratio/100, printedImage->width(), printedImage->height());
+
+    // Update printedImage
+    setPixmap(QPixmap::fromImage(*printedImage));
+}
+
