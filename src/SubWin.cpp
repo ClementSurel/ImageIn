@@ -106,7 +106,6 @@ void SubWin::addBubble()
 
     bubbles.push_back(newBubble);
 
-    newBubble->move(x, y);
     newBubble->show();
 }
 
@@ -171,7 +170,7 @@ void SubWin::resizePage(bool zoomIn)
         tabOfPhoto[i]->resizeWithZoom(zoomRatio);
 
     for (int i = 0; i < bubbles.size(); i++)
-        bubbles[i]->resize(zoomRatio);
+        bubbles[i]->resizeWithZoom(zoomRatio);
 }
 
 void SubWin::resizePage(int value)
@@ -186,6 +185,6 @@ void SubWin::resizePage(int value)
 
     for (int i = 0; i < bubbles.size(); i++)
         //bubbles[i]->resize(zoomRatio*100/oldRatio);
-        bubbles[i]->resize(zoomRatio);
+        bubbles[i]->resizeWithZoom(zoomRatio);
 }
 

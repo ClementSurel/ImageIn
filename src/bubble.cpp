@@ -1,11 +1,13 @@
 #include "bubble.h"
 
 Bubble::Bubble(int x, int y, int ratio, QWidget* parent) :  QLabel (parent),
-                                                            topLeftGrip(this),
-                                                            topRightGrip(this),
-                                                            downLeftGrip(this),
-                                                            downRightGrip(this)
+                                                            topLeftGrip(this, Grip::topLeft),
+                                                            topRightGrip(this, Grip::topRight),
+                                                            downLeftGrip(this, Grip::bottomLeft),
+                                                            downRightGrip(this, Grip::bottomRight)
 {
+    zoom = ratio;
+
     // Create the painter object
     painter = new QPainter;
 
@@ -19,7 +21,8 @@ Bubble::Bubble(int x, int y, int ratio, QWidget* parent) :  QLabel (parent),
     painter->setRenderHints(QPainter::Antialiasing, true);
 
     QPainterPath path(QPointF(0, 0));
-    path.addEllipse(QRectF(10, 10, img->width()-20, img->height()-20));
+    path.addEllipse(QRectF(MARGIN_BUBBLE*zoom/100, MARGIN_BUBBLE*zoom/100,
+                           img->width()-(2*MARGIN_BUBBLE*zoom/100), img->height()-(2*MARGIN_BUBBLE*zoom/100)));
 
     painter->drawPath(path);
     painter->fillPath(path, QBrush(Qt::white));
@@ -40,27 +43,30 @@ Bubble::Bubble(int x, int y, int ratio, QWidget* parent) :  QLabel (parent),
     connect(act_raise, SIGNAL(triggered()), this, SLOT(raise()));
 
     // Set up the widget properties
-    setWindowFlag(Qt::SubWindow);
+    setWindowFlag(Qt::SubWindow); // To allow resizing with grips
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    setMinimumSize(80, 80);
-
-    // Display the bubble image
-    setPixmap(QPixmap::fromImage(*img));
-    setGeometry(0, 0, img->width(), img->height());
-    show();
-
-    zoom = ratio;
+    setMinimumSize(MIN_SIZE_W, MIN_SIZE_H);
 
     realX = x*100/zoom;
     realY = y*100/zoom;
-    realWidth = width()*100/zoom;
-    realHeight = height()*100/zoom;
+    realWidth = img->width()*100/zoom;
+    realHeight = img->height()*100/zoom;
+
+    // Display the bubble image
+    setPixmap(QPixmap::fromImage(*img));
+    setGeometry(x, y, img->width(), img->height());
+    show();
 
     // Position the grips
     topLeftGrip.move(0, 0);
     topRightGrip.move(width()-topRightGrip.width(), 0);
     downLeftGrip.move(0, height()-downLeftGrip.height());
     downRightGrip.move(width()-downRightGrip.width(), height()-downRightGrip.height());
+
+    connect(&topLeftGrip, SIGNAL(grabbed(QMouseEvent*, Grip::Corner)), this, SLOT(resizeWithGrip(QMouseEvent*, Grip::Corner)));
+    connect(&topRightGrip, SIGNAL(grabbed(QMouseEvent*, Grip::Corner)), this, SLOT(resizeWithGrip(QMouseEvent*, Grip::Corner)));
+    connect(&downLeftGrip, SIGNAL(grabbed(QMouseEvent*, Grip::Corner)), this, SLOT(resizeWithGrip(QMouseEvent*, Grip::Corner)));
+    connect(&downRightGrip, SIGNAL(grabbed(QMouseEvent*, Grip::Corner)), this, SLOT(resizeWithGrip(QMouseEvent*, Grip::Corner)));
 }
 
 Bubble::~Bubble()
@@ -76,6 +82,7 @@ Bubble::~Bubble()
 
 QImage Bubble::createFinalImage(int ratio)
 {    
+    /*
     // Create final Image object
     QImage finalImage (img->width()*100/ratio, img->height()*100/ratio, QImage::Format_ARGB32);
 
@@ -112,6 +119,9 @@ QImage Bubble::createFinalImage(int ratio)
     painter->end();
 
     return finalImage;
+    */
+
+    return resizeBubble(realWidth, realHeight);
 }
 
 // Mouse events
@@ -157,10 +167,16 @@ void Bubble::mouseReleaseEvent (QMouseEvent *event)
 
 void Bubble::mouseMoveEvent (QMouseEvent *event)
 {
+    if ( (event->buttons() & Qt::RightButton) == Qt::RightButton)
+        return;
+
     QPoint point = mapFromGlobal(event->globalPos());
     point = mapToParent(point);
 
     move(point.x() - clickPosistion.x() , point.y() - clickPosistion.y());
+
+    realX = x()*100/zoom;
+    realY = y()*100/zoom;
 }
 
 void Bubble::mouseDoubleClickEvent (QMouseEvent *event)
@@ -180,8 +196,8 @@ void Bubble::mouseDoubleClickEvent (QMouseEvent *event)
         // Repaint the image
         // Draw the bubble
         QPainterPath path(QPointF(0, 0));
-        path.addEllipse(QRectF(10, 10, img->width()-20, img->height()-20));
-
+        path.addEllipse(QRectF(MARGIN_BUBBLE*zoom/100, MARGIN_BUBBLE*zoom/100,
+                               img->width()-(2*MARGIN_BUBBLE*zoom/100), img->height()-(2*MARGIN_BUBBLE*zoom/100)));
         painter->begin(img);
         painter->setRenderHints(QPainter::Antialiasing, true);
         painter->setPen(Qt::black);
@@ -215,32 +231,77 @@ void Bubble::contextMenuEvent(QContextMenuEvent *event)
 }
 
 // Resize
-void Bubble::resize(int ratio)
+void Bubble::resizeWithZoom(int ratio)
 {
     zoom = ratio;
 
     // Change the font pointsize
     QFont newFont = editingText->font();
-    //newFont.setPointSize(DEFAULT_FONT_POINTSIZE*zoom/100);
-    newFont.setPointSize(newFont.pointSize()*zoom/100);
+    newFont.setPointSize(DEFAULT_FONT_POINTSIZE*zoom/100);
     editingText->setFont(newFont);
 
     // Resize everything
     setGeometry(realX*zoom/100, realY*zoom/100, realWidth*zoom/100, realHeight*zoom/100);
 }
 
-void Bubble::resizeEvent (QResizeEvent*)
+void Bubble::resizeWithGrip (QMouseEvent *e, Grip::Corner c)
+{
+    int newX, newY, newWidth, newHeight;
+
+    QPoint mousePoint = mapFromGlobal(e->globalPos());
+    mousePoint = mapToParent(mousePoint);
+
+    switch (c)
+    {
+        case Grip::topLeft:
+            newWidth = x() - mousePoint.x() + width();
+            newHeight = y() - mousePoint.y() + height();
+            newX = mousePoint.x();
+            newY = mousePoint.y();
+            break;
+        case Grip::topRight:
+            newWidth = mousePoint.x() - x();
+            newHeight = y() - mousePoint.y() + height();
+            newX = x();
+            newY = mousePoint.y();
+            break;
+        case Grip::bottomLeft:
+            newWidth = x() - mousePoint.x() + width();
+            newHeight = mousePoint.y() - y();
+            newX = mousePoint.x();
+            newY = y();
+            break;
+        case Grip::bottomRight:
+            newWidth = mousePoint.x() - x();
+            newHeight = mousePoint.y() - y();
+            newX = x();
+            newY = y();
+            break;
+    }
+
+    // Update real Position and Dimensions
+    realX = newX*100/zoom;
+    realY = newY*100/zoom;
+    realWidth = newWidth*100/zoom;
+    realHeight = newHeight*100/zoom;
+
+    setGeometry(newX, newY, newWidth, newHeight);
+}
+
+QImage Bubble::resizeBubble (int newWidth, int newHeight)
 {
     // Repaint the image
-    *img = QImage(this->width(), this->height(), QImage::Format_ARGB32);
+    QImage resizedImage(newWidth, newHeight, QImage::Format_ARGB32);
     QColor color(Qt::transparent);
-    img->fill(color);
-    QPainterPath path(QPointF(0, 0));
-    path.addEllipse(QRectF(10, 10, img->width()-20, img->height()-20));
+    resizedImage.fill(color);
 
-    painter->begin(img);
+    painter->begin(&resizedImage);
     painter->setRenderHints(QPainter::Antialiasing, true);
     painter->setPen(Qt::black);
+
+    QPainterPath path(QPointF(0, 0));
+    path.addEllipse(QRectF(MARGIN_BUBBLE*zoom/100, MARGIN_BUBBLE*zoom/100,
+                           resizedImage.width()-(2*MARGIN_BUBBLE*zoom/100), resizedImage.height()-(2*MARGIN_BUBBLE*zoom/100)));
     painter->drawPath(path);
     painter->fillPath(path, QBrush(Qt::white));
 
@@ -251,7 +312,7 @@ void Bubble::resizeEvent (QResizeEvent*)
     textOp.setAlignment(Qt::AlignCenter);
 
     // Resize and reposition the text
-    editingText->setGeometry(20, 20, img->width()-40, img->height()-40);
+    editingText->setGeometry(20, 20, resizedImage.width()-40, resizedImage.height()-40);
 
     // Draw the text
     painter->drawText(QRectF(editingText->x(), editingText->y(),
@@ -260,12 +321,15 @@ void Bubble::resizeEvent (QResizeEvent*)
 
     painter->end();
 
-    setPixmap(QPixmap::fromImage(*img));
+    return resizedImage;
+}
 
-    realX = x()*100/zoom;
-    realY = y()*100/zoom;
-    realWidth = width()*100/zoom;
-    realHeight = height()*100/zoom;
+void Bubble::resizeEvent (QResizeEvent*)
+{
+    delete img;
+    img = new QImage(resizeBubble(width(), height()));
+
+    setPixmap(QPixmap::fromImage(*img));
 
     // Reposition grips
     topLeftGrip.move(0, 0);

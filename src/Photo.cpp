@@ -46,8 +46,8 @@ Photo::Photo(QWidget *parent) : QLabel(parent),
     selecting = false;
 
     // Set up widget properties
-    setWindowFlag(Qt::SubWindow);
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setWindowFlag(Qt::SubWindow); // To allow resizing with grips
+    //setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     // Connections with subwindow
     connect(this, SIGNAL(isSelecting(bool)), parent, SLOT(updateSelectingPhoto(bool)));
@@ -119,7 +119,7 @@ bool Photo::loadImage(int x, int y, int zoom)
 
 QImage Photo::finalImage (int zoomRatio)
 {
-    return resizeImage(printedImage->width()*100/zoomRatio, printedImage->height()*100/zoomRatio);
+    return resizeImage(realWidth, realHeight);
 }
 
 
@@ -406,7 +406,8 @@ void Photo::resizeWithZoom (int zoom)
 {
     this->zoom = zoom;
 
-    *printedImage = resizeImage(realWidth*zoom/100, realHeight*zoom/100);
+    delete printedImage;
+    printedImage = new QImage(resizeImage(realWidth*zoom/100, realHeight*zoom/100));
 
     setGeometry(realX*zoom/100, realY*zoom/100, printedImage->width(), printedImage->height());
 

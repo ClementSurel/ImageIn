@@ -6,14 +6,18 @@
 #include <QtWidgets>
 #include <QMouseEvent>
 
+#include "grip.h"
 
-#define MIN_SIZE_W      1
-#define MIN_SIZE_H      1
 
-#define NATIVE_SIZE_W      80
-#define NATIVE_SIZE_H      80
+#define MIN_SIZE_W                  25
+#define MIN_SIZE_H                  25
 
-#define DEFAULT_FONT_POINTSIZE  72
+#define NATIVE_SIZE_W               80
+#define NATIVE_SIZE_H               80
+
+#define DEFAULT_FONT_POINTSIZE      72
+
+#define MARGIN_BUBBLE               10
 
 
 class Bubble : public QLabel
@@ -34,7 +38,11 @@ class Bubble : public QLabel
         void mouseDoubleClickEvent (QMouseEvent*);
         void contextMenuEvent(QContextMenuEvent *event);
         void resizeEvent (QResizeEvent*);
-        void resize(int ratio);
+        void resizeWithZoom(int ratio);
+        QImage resizeBubble (int newWidth, int newHeight);
+
+    public slots:
+        void resizeWithGrip (QMouseEvent *e, Grip::Corner corner);
 
     private:
 
@@ -57,10 +65,10 @@ class Bubble : public QLabel
         QTextEdit *editingText;
 
         // grips
-        QSizeGrip topLeftGrip;
-        QSizeGrip topRightGrip;
-        QSizeGrip downLeftGrip;
-        QSizeGrip downRightGrip;
+        Grip topLeftGrip;
+        Grip topRightGrip;
+        Grip downLeftGrip;
+        Grip downRightGrip;
 
         // Position of the mouse when the user clicks
         QPoint clickPosistion;
