@@ -12,40 +12,43 @@ class Window : public QMainWindow
 {
     Q_OBJECT
 
-public:
-    explicit Window(QWidget *parent = nullptr);
-    ~Window();
+    public:
 
-public slots:
-    void activateActions(bool);
-    void activateCropAction(bool);
+        explicit Window(QWidget *parent = nullptr);
+        ~Window();
 
-private:
-    // Menu File
-    QMenu* menuFile;
-    QAction* act_save;
+    public slots:
 
-    // Menu Edit
-    QMenu* menuEdit;
-    QAction *act_newPhoto;
-    QAction* act_reverseH;
-    QAction* act_reverseV;
-    QAction *act_crop;
-    QAction* act_bubble;
-    QAction* act_supprPhoto;
+        void activateActions(bool);
+        void activateCropAction(bool);
 
-    // Menu View
-    QAction* act_zoomIn;
-    QAction* act_zoomOut;
-    QMenu* menuView;
+    private:
 
-    // Tool bar
-    QToolBar *toolBar;
-    QSlider *zoomSlider;
+        // Menu File
+        QMenu* menuFile;
+        QAction* act_save;
 
-    // Central Widget
-    QScrollArea *scroll;
-    SubWin* centralSubWin;
+        // Menu Edit
+        QMenu* menuEdit;
+        QAction *act_newPhoto;
+        QAction* act_reverseH;
+        QAction* act_reverseV;
+        QAction *act_crop;
+        QAction* act_bubble;
+        QAction* act_supprPhoto;
+
+        // Menu View
+        QMenu* menuView;
+        QAction* act_zoomIn;
+        QAction* act_zoomOut;
+
+        // Tool bar
+        QToolBar *toolBar;
+        QSlider *zoomSlider;
+
+        // Central Widget
+        QScrollArea *scroll;
+        SubWin* centralSubWin;
 };
 
 #endif // WINDOW_H

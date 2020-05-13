@@ -10,61 +10,70 @@ Window::Window(QWidget *parent) : QMainWindow(parent)
 {
     // Set up File menu
     menuFile = new QMenu("File");
-    act_save = new QAction("Save");
 
+    act_save = new QAction("Save");
     menuFile->addAction(act_save);
+
     menuBar()->addMenu(menuFile);
 
     // Set up Edit menu
     menuEdit = new QMenu("Edit");
+
     act_newPhoto = new QAction("Add a new photo");
+    menuEdit->addAction(act_newPhoto);
+
     act_reverseH = new QAction("Reverse horizontally");
     act_reverseH->setEnabled(false);
+    menuEdit->addAction(act_reverseH);
+
     act_reverseV = new QAction("Reverse vertically");
     act_reverseV->setEnabled(false);
+    menuEdit->addAction(act_reverseV);
+
     act_crop = new QAction("Crop");
     act_crop->setEnabled(false);
+    menuEdit->addAction(act_crop);
+
     act_supprPhoto = new QAction("Suppress the photo");
     act_supprPhoto->setEnabled(false);
-    act_bubble = new QAction("Add a new bubble");
-
-    menuEdit->addAction(act_newPhoto);
-    menuEdit->addAction(act_reverseH);
-    menuEdit->addAction(act_reverseV);
-    menuEdit->addAction(act_crop);
     menuEdit->addAction(act_supprPhoto);
+
     menuEdit->addSeparator();
+
+    act_bubble = new QAction("Add a new bubble");
     menuEdit->addAction(act_bubble);
+
     menuBar()->addMenu(menuEdit);
 
     // Set up the View menu
     menuView = new QMenu("View");
-    act_zoomIn = new QAction("Zoom +");
-    act_zoomOut = new QAction("Zoom -");
 
+    act_zoomIn = new QAction("Zoom +");
     menuView->addAction(act_zoomIn);
+
+    act_zoomOut = new QAction("Zoom -");
     menuView->addAction(act_zoomOut);
+
     menuBar()->addMenu(menuView);
 
     // Set up the tool bar
     toolBar = new QToolBar(this);
 
     zoomSlider = new QSlider(Qt::Horizontal, this);
-    zoomSlider->setMinimum(15);
+    zoomSlider->setMinimum(10);
+    zoomSlider->setMaximum(200);
     zoomSlider->setValue(100);
-
     toolBar->addWidget(zoomSlider);
+
     addToolBar(toolBar);
 
     // Set up the central widget
     scroll = new QScrollArea(this);
+
     centralSubWin = new SubWin(scroll, this);
-
     scroll->setWidget(centralSubWin);
-    setCentralWidget(scroll);
 
-    // Set geometry of the window
-    setGeometry(0, 0, 800, 600);
+    setCentralWidget(scroll);
 
     // connections from actions to subWin
     connect(act_save, SIGNAL(triggered()), centralSubWin, SLOT(save()));
@@ -83,6 +92,9 @@ Window::Window(QWidget *parent) : QMainWindow(parent)
     // connections from subWin
     connect(centralSubWin, SIGNAL(containsImage(bool)), this, SLOT(activateActions(bool)));
     connect(centralSubWin, SIGNAL(hasASelectingPhoto(bool)), this, SLOT(activateCropAction(bool)));
+
+    // Set geometry of the window
+    setGeometry(0, 0, 800, 600);
 }
 
 Window::~Window()
@@ -96,11 +108,13 @@ Window::~Window()
     delete act_reverseH;
     delete act_reverseV;
     delete act_crop;
+    delete act_supprPhoto;
     delete act_bubble;
     delete menuEdit;
 
     // Menu View
     delete act_zoomIn;
+    delete act_zoomOut;
     delete menuView;
 
     // Tool Bar

@@ -116,7 +116,7 @@ void SubWin::save ()
     for (int i = 0; i < tabOfPhoto.length(); i++)
         m_painter->drawImage(tabOfPhoto[i]->x()*100/zoomRatio, tabOfPhoto[i]->y()*100/zoomRatio, tabOfPhoto[i]->finalImage(zoomRatio));
     for (int i = 0; i < bubbles.length(); i++)
-        m_painter->drawImage(bubbles[i]->x()*100/zoomRatio, bubbles[i]->y()*100/zoomRatio, bubbles[i]->createFinalImage(zoomRatio));
+        m_painter->drawImage(bubbles[i]->x()*100/zoomRatio, bubbles[i]->y()*100/zoomRatio, bubbles[i]->createFinalImage());
     m_painter->end();
 
     // Ask user where to save the image

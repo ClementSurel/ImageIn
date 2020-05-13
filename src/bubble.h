@@ -29,7 +29,8 @@ class Bubble : public QLabel
         Bubble(int x, int y, int ratio, QWidget *parent = nullptr);
         ~Bubble();
 
-        QImage createFinalImage (int ratio);
+        // Create the image for saving
+        QImage createFinalImage ();
 
         // mouse events
         void mousePressEvent (QMouseEvent*);

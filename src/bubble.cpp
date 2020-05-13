@@ -30,7 +30,9 @@ Bubble::Bubble(int x, int y, int ratio, QWidget* parent) :  QLabel (parent),
 
     // Set up the editing text
     editingText = new QTextEdit(this);
-    editingText->setGeometry(20, 20, img->width()-40, img->height()-40);
+    //editingText->setGeometry(20*zoom/100, 20*zoom/100, img->width()-(40*zoom/100), img->height()-(40*zoom/100));
+    editingText->setGeometry(20*zoom/100, 20*zoom/100,
+                             img->width()-(40*zoom/100), img->height()-(40*zoom/100));
     editingText->setAlignment(Qt::AlignCenter);
     editingText->setFont(QFont("Comic Sans MS", DEFAULT_FONT_POINTSIZE*ratio/100));
     editingText->setVisible(false);
@@ -80,11 +82,10 @@ Bubble::~Bubble()
     delete act_raise;
 }
 
-QImage Bubble::createFinalImage(int ratio)
+QImage Bubble::createFinalImage()
 {    
-    /*
     // Create final Image object
-    QImage finalImage (img->width()*100/ratio, img->height()*100/ratio, QImage::Format_ARGB32);
+    QImage finalImage (realWidth, realHeight, QImage::Format_ARGB32);
 
     // Fill it with transparent color
     QColor color(Qt::transparent);
@@ -95,8 +96,8 @@ QImage Bubble::createFinalImage(int ratio)
     painter->setRenderHints(QPainter::Antialiasing, true);
 
     QPainterPath path(QPointF(0, 0));
-    path.addEllipse(QRectF(10*100/ratio, 10*100/ratio,
-                           finalImage.width()-20*100/ratio, finalImage.height()-20*100/ratio));
+    path.addEllipse(QRectF(MARGIN_BUBBLE, MARGIN_BUBBLE,
+                           finalImage.width()-(2*MARGIN_BUBBLE), finalImage.height()-(2*MARGIN_BUBBLE)));
 
     painter->setPen(Qt::black);
     painter->drawPath(path);
@@ -104,24 +105,19 @@ QImage Bubble::createFinalImage(int ratio)
 
     // Draw the text
     QFont newFont = editingText->font();
-    newFont.setPointSize(newFont.pointSize()*100/ratio);
-
+    newFont.setPointSize(DEFAULT_FONT_POINTSIZE);
     painter->setFont(newFont);
-
     QTextOption textOp;
     textOp.setWrapMode(QTextOption::WordWrap);
     textOp.setAlignment(Qt::AlignCenter);
 
-    painter->drawText(QRectF(editingText->x()*100/ratio, editingText->y()*100/ratio,
-                             editingText->width()*100/ratio, editingText->height()*100/ratio),
+    painter->drawText(QRectF(editingText->x()*100/zoom, editingText->y()*100/zoom,
+                             editingText->width()*100/zoom, editingText->height()*100/zoom),
                              editingText->toPlainText(), textOp);
 
     painter->end();
 
     return finalImage;
-    */
-
-    return resizeBubble(realWidth, realHeight);
 }
 
 // Mouse events
@@ -312,7 +308,8 @@ QImage Bubble::resizeBubble (int newWidth, int newHeight)
     textOp.setAlignment(Qt::AlignCenter);
 
     // Resize and reposition the text
-    editingText->setGeometry(20, 20, resizedImage.width()-40, resizedImage.height()-40);
+    editingText->setGeometry(20*zoom/100, 20*zoom/100,
+                             resizedImage.width()-(40*zoom/100), resizedImage.height()-(40*zoom/100));
 
     // Draw the text
     painter->drawText(QRectF(editingText->x(), editingText->y(),
