@@ -113,10 +113,28 @@ void SubWin::save ()
 {
     // Create the saved image. Draw all the photos and bubbles
     m_painter->begin(page);
+
+    /*
     for (int i = 0; i < tabOfPhoto.length(); i++)
         m_painter->drawImage(tabOfPhoto[i]->x()*100/zoomRatio, tabOfPhoto[i]->y()*100/zoomRatio, tabOfPhoto[i]->finalImage(zoomRatio));
     for (int i = 0; i < bubbles.length(); i++)
         m_painter->drawImage(bubbles[i]->x()*100/zoomRatio, bubbles[i]->y()*100/zoomRatio, bubbles[i]->createFinalImage());
+    */
+
+    QObjectList const &widgetsList = children();
+    for (int i = 0; i < widgetsList.size(); i++)
+    {
+        if (QString(widgetsList[i]->metaObject()->className()) == "Photo")
+        {
+            Photo *photo = qobject_cast<Photo*>(widgetsList[i]);
+            m_painter->drawImage(photo->x()*100/zoomRatio, photo->y()*100/zoomRatio, photo->finalImage(zoomRatio));
+        }
+        else if (QString(widgetsList[i]->metaObject()->className()) == "Bubble")
+        {
+            Bubble *photo = qobject_cast<Bubble*>(widgetsList[i]);
+            m_painter->drawImage(photo->x()*100/zoomRatio, photo->y()*100/zoomRatio, photo->createFinalImage());
+        }
+    }
     m_painter->end();
 
     // Ask user where to save the image
