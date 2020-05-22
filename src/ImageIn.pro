@@ -2,16 +2,16 @@ QT +=\
     widgets
 
 HEADERS += \
-    ../../src/Photo.h \
-    ../../src/SubWin.h \
-    ../../src/Window.h \
-    ../../src/bubble.h \
-    ../../src/grip.h
+    Photo.h \
+    SubWin.h \
+    Window.h \
+    bubble.h \
+    grip.h
 
 SOURCES += \
-    ../../src/Photo.cpp \
-    ../../src/SubWin.cpp \
-    ../../src/Window.cpp \
-    ../../src/bubble.cpp \
-    ../../src/grip.cpp \
-    ../../src/main.cpp
+    Photo.cpp \
+    SubWin.cpp \
+    Window.cpp \
+    bubble.cpp \
+    grip.cpp \
+    main.cpp

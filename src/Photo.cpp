@@ -117,6 +117,41 @@ bool Photo::loadImage(int x, int y, int zoom)
     return false;
 }
 
+bool Photo::pasteImage(int x, int y, int zoom)
+{
+    QClipboard *clipboard = qApp->clipboard();
+
+    if (clipboard->mimeData()->hasImage())
+    {
+        *loadedImage = clipboard->image();
+        *printedImage = *loadedImage;
+        reversedHorizontally = false;
+        reversedVertically = false;
+        croped = false;
+
+        realWidth = loadedImage->width();
+        realHeight = loadedImage->height();
+        resizeWithZoom(zoom);
+
+        move(x, y);
+        realX = this->x()*100/zoom;
+        realY = this->y()*100/zoom;
+
+        show();
+
+        // grip positions
+        topLeftGrip.move(0, 0);
+        topRightGrip.move(width()-topRightGrip.width(), 0);
+        bottomLeftGrip.move(0, height()-bottomRightGrip.height());
+        bottomRightGrip.move(width()-topRightGrip.width(), height()-bottomRightGrip.height());
+
+        return true;
+    }
+
+    return false;
+}
+
+
 QImage Photo::finalImage (int zoomRatio)
 {
     return resizeImage(realWidth, realHeight);

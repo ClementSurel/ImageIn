@@ -18,6 +18,7 @@ class Photo : public QLabel
         Photo(QWidget*);
         ~Photo();
         bool loadImage(int x, int y, int zoomRatio);
+        bool pasteImage(int x, int y, int zoom);
         QImage finalImage(int zoomRatio);
         void mousePressEvent(QMouseEvent*);
         void mouseDoubleClickEvent(QMouseEvent *event);

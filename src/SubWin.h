@@ -17,28 +17,30 @@ class SubWin : public QWidget
 {
     Q_OBJECT
 
-public:
-    SubWin(QScrollArea* givenScroll, QWidget* parent = nullptr);
-    ~SubWin();
-    void resizePage(bool zoomIn);
+    public:
+        SubWin(QScrollArea* givenScroll, QWidget* parent = nullptr);
+        ~SubWin();
+        void resizePage(bool zoomIn);
+        void contextMenuEvent(QContextMenuEvent *e);
 
-signals:
-    void containsImage(bool);
-    void hasASelectingPhoto(bool);
+    signals:
+        void containsImage(bool);
+        void hasASelectingPhoto(bool);
 
-public slots:
-    void loadImage();
-    void save ();
-    void reverseH();
-    void reverseV();
-    void crop();
-    void supprPhoto();
-    void addBubble();
-    void updateActivePhoto();
-    void updateSelectingPhoto(bool);
-    void zoomIn();
-    void zoomOut();
-    void resizePage(int value);
+    public slots:
+        void loadImage();
+        void pasteImage();
+        void save ();
+        void reverseH();
+        void reverseV();
+        void crop();
+        void supprPhoto();
+        void addBubble();
+        void updateActivePhoto();
+        void updateSelectingPhoto(bool);
+        void zoomIn();
+        void zoomOut();
+        void resizePage(int value);
 
     private:
 
@@ -64,7 +66,11 @@ public slots:
         QPainter *m_painter;
 
         // Point where the user clicks
-        QPoint relativePos;
+        QPoint clickPoint;
+
+        // context menu
+        QMenu *contextMenu;
+        QAction *act_paste;
 };
 
 #endif // SUBWIN_H

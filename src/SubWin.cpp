@@ -24,6 +24,13 @@ SubWin::SubWin(QScrollArea* givenScroll, QWidget* parent) : QWidget(parent),
     // pointer to photo and bubble
     movingBubble = nullptr;
     activePhoto = nullptr;
+
+    // Context Menu
+    contextMenu = new QMenu;
+    act_paste = new QAction("paste", this);
+    contextMenu->addAction(act_paste);
+
+    connect(act_paste, SIGNAL(triggered()), this, SLOT(pasteImage()));
 }
 
 SubWin::~SubWin()
@@ -39,6 +46,15 @@ SubWin::~SubWin()
 
     delete page;
     delete labPage;
+
+    delete act_paste;
+    delete contextMenu;
+}
+
+void SubWin::contextMenuEvent(QContextMenuEvent *e)
+{
+    contextMenu->move(e->globalPos());
+    contextMenu->show();
 }
 
 void SubWin::loadImage()
@@ -57,6 +73,25 @@ void SubWin::loadImage()
     {
         delete p;
     }
+}
+
+void SubWin::pasteImage()
+{
+    Photo* p = new Photo(this);
+    int x = scroll->horizontalScrollBar()->value();
+    int y = scroll->verticalScrollBar()->value();
+
+    if (p->pasteImage(x, y, zoomRatio))
+    {
+        tabOfPhoto.push_back(p);
+        activePhoto = p;
+        emit containsImage(true);
+    }
+    else
+    {
+        delete p;
+    }
+
 }
 
 void SubWin::reverseH ()
